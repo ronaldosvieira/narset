@@ -43,3 +43,7 @@ void load_cards() {
 
     fclose(card_list);
 }
+
+int has_keyword(Card card, Keyword keyword) {
+    return card.keywords >> keyword & 1; // NOLINT(hicpp-signed-bitwise)
+}
