@@ -64,3 +64,14 @@ Card* copy_card(Card card) {
 
     return copied_card;
 }
+
+/* Player methods */
+void init_player(Player* player, int id) {
+    player->id = 0;
+    player->health = 30;
+    player->base_mana = 0;
+    player->bonus_mana = 0;
+    player->mana = 0;
+    player->next_rune = 25;
+    player->bonus_draw = 0;
+}
