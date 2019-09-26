@@ -27,7 +27,7 @@ void load_cards() {
     for (int i = 0; i < 160; i++) {
         char card_keywords[7];
 
-        _cards[i].instance_id = next_instance_id();
+        _cards[i].instance_id = -1;
 
         fscanf(card_list, format, &_cards[i].id, &_cards[i].type, &_cards[i].cost,
                 &_cards[i].attack, &_cards[i].defense, card_keywords,
