@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int instance_counter = 0;
 Card _cards[160];
@@ -54,4 +55,12 @@ void add_keyword(Card* card, Keyword keyword) {
 
 void remove_keyword(Card* card, Keyword keyword) {
     card->keywords &= ~(1 << keyword); // NOLINT(hicpp-signed-bitwise)
+}
+
+Card* copy_card(Card card) {
+    Card *copied_card = malloc(sizeof(Card));
+
+    memcpy(copied_card, &card, sizeof(Card));
+
+    return copied_card;
 }
