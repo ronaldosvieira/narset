@@ -36,8 +36,8 @@ typedef int Lane;
 
 #define BREAKTHROUGH 0
 #define CHARGE 1
-#define GUARD 2
-#define DRAIN 3
+#define DRAIN 2
+#define GUARD 3
 #define LETHAL 4
 #define WARD 5
 
