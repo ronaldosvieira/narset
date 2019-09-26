@@ -75,3 +75,12 @@ void init_player(Player* player, int id) {
     player->next_rune = 25;
     player->bonus_draw = 0;
 }
+
+void damage_player(Player* player, int amount) {
+    player->health -= amount;
+
+    while (player->health <= player->next_rune) {
+        player->next_rune -= 5;
+        player->bonus_draw += 1;
+    }
+}
