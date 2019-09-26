@@ -65,7 +65,7 @@ typedef struct State {
     Player player;
     Player enemy;
 
-    Card draft[3][30];
+    Card draft[30][3];
     Card cards[];
 } State;
 
@@ -83,6 +83,7 @@ void init_player(Player* player, int id);
 void damage_player(Player* player, int amount);
 
 /* State methods */
-State* new_state();
+void new_draft(State* state);
+void init_state(State* state);
 
 #endif //NARSET_ENGINE_H

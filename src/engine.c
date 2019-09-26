@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 
 int instance_counter = 0;
 Card _cards[160];
@@ -83,4 +84,51 @@ void damage_player(Player* player, int amount) {
         player->next_rune -= 5;
         player->bonus_draw += 1;
     }
+}
+
+void new_draft(State* state) {
+    int all_cards[160];
+
+    // fill array with numbers from 0 to 159
+    for (int i = 0; i < 160; i++) all_cards[i] = i;
+
+    // shuffle array
+    for (int i = 0; i < 160; i++) {
+        int temp = all_cards[i];
+        int random_pos = rand() % 160;
+
+        all_cards[i] = all_cards[random_pos];
+        all_cards[random_pos] = temp;
+    }
+
+    int pool[60];
+
+    // get first 60 elements
+    memcpy(pool, all_cards, sizeof(int) * 60);
+
+    // fill all draft choices
+    for (int i = 0; i < 30; i++) {
+        int first = rand() % 60;
+        int second = rand() % 60;
+        int third = rand() % 60;
+
+        while (second == first)
+            second = rand() % 60;
+
+        while (third == first || third == second)
+            third = rand() % 60;
+
+        state->draft[i][0] = _cards[pool[first]];
+        state->draft[i][1] = _cards[pool[second]];
+        state->draft[i][2] = _cards[pool[third]];
+    }
+}
+
+int main() {
+    struct timeval time;
+    gettimeofday(&time, NULL);
+
+    srand((time.tv_sec * 1000) + (time.tv_usec / 1000));
+
+    load_cards();
 }
