@@ -47,3 +47,11 @@ void load_cards() {
 int has_keyword(Card card, Keyword keyword) {
     return card.keywords >> keyword & 1; // NOLINT(hicpp-signed-bitwise)
 }
+
+void add_keyword(Card* card, Keyword keyword) {
+    card->keywords |= 1 << keyword; // NOLINT(hicpp-signed-bitwise)
+}
+
+void remove_keyword(Card* card, Keyword keyword) {
+    card->keywords &= ~(1 << keyword); // NOLINT(hicpp-signed-bitwise)
+}
