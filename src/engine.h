@@ -23,14 +23,14 @@ typedef int CardType;
 
 #define OUTSIDE -1
 #define P0_HAND 0
-#define P0_BOARD 1
-#define P1_BOARD 2
-#define P1_HAND 3
+#define P0_BOARD 8
+#define P1_BOARD 14
+#define P1_HAND 20
 
 typedef int Location;
 
 #define LEFT_LANE 0
-#define RIGHT_LANE 0
+#define RIGHT_LANE 3
 
 typedef int Lane;
 
@@ -41,13 +41,13 @@ typedef int Lane;
 #define LETHAL 4
 #define WARD 5
 
-typedef int Keyword;
+typedef unsigned int Keyword;
 
 typedef struct Card {
     int id, instance_id;
     CardType type;
     int cost, attack, defense, player_hp, enemy_hp, card_draw;
-    int keywords;
+    unsigned int keywords;
     Location location; Lane lane;
 } Card;
 
@@ -61,19 +61,26 @@ typedef struct Player {
     int bonus_draw;
 } Player;
 
+#define DRAFT_PHASE 0
+#define BATTLE_PHASE 1
+
+typedef int Phase;
+
 typedef struct State {
+    Phase phase;
+    int turn;
+    int current_player;
+
     Player player;
     Player enemy;
 
-    Card draft[30][3];
-    Card cards[];
+    Card cards[8+6+6];
+
+    int winner;
 } State;
 
 /* Card methods */
-int next_instance_id();
-void load_cards();
-
-int has_keyword(Card card, Keyword keyword);
+unsigned int has_keyword(Card card, Keyword keyword);
 void add_keyword(Card* card, Keyword keyword);
 void remove_keyword(Card* card, Keyword keyword);
 Card* copy_card(Card card);
@@ -83,7 +90,10 @@ void init_player(Player* player, int id);
 void damage_player(Player* player, int amount);
 
 /* State methods */
-void new_draft(State* state);
 void init_state(State* state);
+Action* get_available_actions(State* state);
+void act_on_state(State* state, Action* action);
+State* copy_state(State* state);
+State* state_from_native_input(char* input);
 
 #endif //NARSET_ENGINE_H
