@@ -60,7 +60,7 @@ void init_state(State* state) {
     for (int i = 0; i < CARDS_IN_STATE; i++)
         state->cards[i].instance_id = -1;
 
-    state->valid_actions[0] = -1;
+    state->valid_actions[0] = NONE;
 
     state->winner = -1;
 }
@@ -193,6 +193,34 @@ Action decode_action(uint8 action) {
     }
 
     return (Action) {.type = type, .origin = origin, .target = target};
+}
+
+void do_summon(State* state, int8 origin, int8 lane) {
+    // todo: implement
+}
+
+void do_use(State* state, int8 origin, int8 target) {
+    // todo: implement
+}
+void do_attack(State* state, int8 origin, int8 target) {
+    // todo: implement
+}
+
+void do_pass(State* state) {
+    // todo: implement
+}
+
+void act_on_state(State* state, uint8 action_index) {
+    Action action = decode_action(action_index);
+
+    switch (action.type) {
+        case SUMMON: do_summon(state, action.origin, action.target); break;
+        case USE: do_use(state, action.origin, action.target); break;
+        case ATTACK: do_attack(state, action.origin, action.target); break;
+        default: do_pass(state); break;
+    }
+
+    state->valid_actions[0] = NONE;
 }
 
 State* copy_state(State* state) {
