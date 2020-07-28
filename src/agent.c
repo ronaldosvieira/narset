@@ -92,5 +92,22 @@ int main() {
     printf("%d %d %d\n", has_keyword(state->cards[1], GUARD),
             has_keyword(state->cards[1], CHARGE), state->cards[1].id);
     printf("%d\n", state->winner);
+
+    calculate_valid_actions(state);
+
+    for (int i = SUMMON_START_INDEX; i < SUMMON_START_INDEX + 16; ++i) {
+        printf("%d ", state->valid_actions[i]);
+    }
+    printf("\n");
+
+    for (int i = USE_START_INDEX; i < USE_START_INDEX + 104; ++i) {
+        printf("%d ", state->valid_actions[i]);
+    }
+    printf("\n");
+
+    for (int i = ATTACK_START_INDEX; i < ATTACK_START_INDEX + 24; ++i) {
+        printf("%d ", state->valid_actions[i]);
+    }
+    printf("\n");
 }
 #pragma clang diagnostic pop

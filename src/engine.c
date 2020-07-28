@@ -59,7 +59,105 @@ void init_state(State* state) {
     for (int i = 0; i < CARDS_IN_STATE; i++)
         state->cards[i].instance_id = -1;
 
+    state->valid_actions[0] = -1;
+
     state->winner = -1;
+}
+
+void calculate_valid_actions(State* state) {
+    int *actions = state->valid_actions;
+
+    // valid actions have already been calculated
+    if (actions[0] != -1) return;
+
+    // passing is always allowed
+    actions[0] = TRUE;
+
+    // control variables
+    int left_lane_is_full = state->cards_in_left_lane >= MAX_CARDS_SINGLE_LANE;
+    int right_lane_is_full = state->cards_in_right_lane >= MAX_CARDS_SINGLE_LANE;
+    int current_player = state->current_player;
+
+    // check actions available for each card in hand
+    for (int i = 0; i < state->cards_in_hand; i++) {
+        Card *card = &state->cards[P0_HAND + i];
+
+        // check if player has mana to cast it
+        if (card->cost > state->players[current_player].mana)
+            continue; // if not, ignores the card
+
+        // enable appropriated actions for the card's type
+        switch (card->type) {
+            case CREATURE:
+                if (!left_lane_is_full)
+                    actions[SUMMON_START_INDEX + i * 2] = TRUE;
+
+                if (!right_lane_is_full)
+                    actions[SUMMON_START_INDEX + i * 2 + 1] = TRUE;
+
+                break;
+
+            case GREEN_ITEM:
+                for (int j = 0; j < state->cards_in_left_lane; j++)
+                    actions[USE_START_INDEX + i * 13 + 1 + j] = TRUE;
+
+                for (int j = 0; j < state->cards_in_right_lane; j++)
+                    actions[USE_START_INDEX + i * 13 + 4 + j] = TRUE;
+
+                break;
+
+            case BLUE_ITEM:
+                actions[USE_START_INDEX + i * 13 + 0] = TRUE;
+
+            case RED_ITEM:
+                for (int j = 0; j < state->cards_in_opp_left_lane; j++)
+                    actions[USE_START_INDEX + i * 13 + 7 + j] = TRUE;
+
+                for (int j = 0; j < state->cards_in_opp_right_lane; j++)
+                    actions[USE_START_INDEX + i * 13 + 10 + j] = TRUE;
+
+                break;
+        }
+    }
+
+    int has_guard_in_left_lane = FALSE;
+    int has_guard_in_right_lane = FALSE;
+
+    // check if there are guards in the left lane
+    for (int j = 0; j < state->cards_in_opp_left_lane; j++)
+        if (has_keyword(state->cards[P1_BOARD + LEFT_LANE + j], GUARD))
+            has_guard_in_left_lane = TRUE;
+
+    // check if there are guards in the right lane
+    for (int j = 0; j < state->cards_in_opp_right_lane; j++)
+        if (has_keyword(state->cards[P1_BOARD + RIGHT_LANE + j], GUARD))
+            has_guard_in_right_lane = TRUE;
+
+    // check attacks available for each creature in the left lane
+    for (int i = 0; i < state->cards_in_left_lane; i++) {
+        for (int j = 0; j < state->cards_in_opp_left_lane; j++) {
+            Card *creature = &state->cards[P1_BOARD + LEFT_LANE + j];
+
+            if (!has_guard_in_left_lane || has_keyword(*creature, GUARD))
+                actions[ATTACK_START_INDEX + i * 4 + 1 + j] = TRUE;
+        }
+
+            if (!has_guard_in_left_lane)
+                actions[ATTACK_START_INDEX + i * 4 + 0] = TRUE;
+    }
+
+    // check attacks available for each creature in the right lane
+    for (int i = 0; i < state->cards_in_right_lane; i++) {
+        for (int j = 0; j < state->cards_in_opp_right_lane; j++) {
+            Card *creature = &state->cards[P1_BOARD + RIGHT_LANE + j];
+
+            if (!has_guard_in_right_lane || has_keyword(*creature, GUARD))
+                actions[ATTACK_START_INDEX + (i + 3) * 4 + 1 + j] = TRUE;
+        }
+
+        if (!has_guard_in_right_lane)
+            actions[ATTACK_START_INDEX + (i + 3) * 4 + 0] = TRUE;
+    }
 }
 
 State* copy_state(State* state) {

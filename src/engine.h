@@ -1,6 +1,11 @@
 #ifndef NARSET_ENGINE_H
 #define NARSET_ENGINE_H
 
+#define FALSE 0
+#define TRUE 1
+
+typedef unsigned char Bool;
+
 #define PASS 0
 #define PICK 1
 #define SUMMON 2
@@ -64,8 +69,13 @@ typedef struct Player {
 } Player;
 
 # define MAX_CARDS_HAND 8
-# define MAX_CARDS_LANE 6
-# define CARDS_IN_STATE (MAX_CARDS_HAND + MAX_CARDS_LANE * 4)
+# define MAX_CARDS_SINGLE_LANE 6
+# define MAX_CARDS_LANES 6
+# define CARDS_IN_STATE (MAX_CARDS_HAND + MAX_CARDS_LANES * 4)
+
+#define SUMMON_START_INDEX 1
+#define USE_START_INDEX 17
+#define ATTACK_START_INDEX 121
 
 typedef struct State {
     int turn;
@@ -77,6 +87,8 @@ typedef struct State {
 
     int cards_in_hand, cards_in_left_lane, cards_in_right_lane;
     int cards_in_opp_left_lane, cards_in_opp_right_lane;
+
+    Bool valid_actions[145];
 
     int winner;
 } State;
@@ -93,7 +105,7 @@ void damage_player(Player* player, int amount);
 
 /* State methods */
 void init_state(State* state);
-Action* get_available_actions(State* state);
+void calculate_valid_actions(State* state);
 void act_on_state(State* state, Action* action);
 State* copy_state(State* state);
 
