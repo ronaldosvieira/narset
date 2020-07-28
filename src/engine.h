@@ -49,6 +49,7 @@ typedef struct Card {
     int cost, attack, defense, player_hp, enemy_hp, card_draw;
     unsigned int keywords;
     Location location; Lane lane;
+    int can_attack;
 } Card;
 
 typedef struct Player {
@@ -61,7 +62,6 @@ typedef struct Player {
     int next_rune;
     int bonus_draw;
 } Player;
-
 
 # define MAX_CARDS_HAND 8
 # define MAX_CARDS_LANE 6
