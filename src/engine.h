@@ -61,13 +61,9 @@ typedef struct Player {
     int bonus_draw;
 } Player;
 
-#define DRAFT_PHASE 0
-#define BATTLE_PHASE 1
 
-typedef int Phase;
 
 typedef struct State {
-    Phase phase;
     int turn;
     int current_player;
 

@@ -48,7 +48,6 @@ void damage_player(Player* player, int amount) {
 }
 
 void init_state(State* state) {
-    state->phase = BATTLE_PHASE;
     state->turn = 1;
     state->current_player = 0;
 
