@@ -167,6 +167,34 @@ void calculate_valid_actions(State* state) {
     }
 }
 
+Action decode_action(uint8 action) {
+    ActionType type = PASS;
+    int8 origin = NONE;
+    int8 target = NONE;
+
+    if (action >= ATTACK_START_INDEX) {
+        action -= ATTACK_START_INDEX;
+
+        type = ATTACK;
+        origin = action / 4;
+        target = (action % 4) - 1; // if zero, then NONE (-1)
+    } else if (action >= USE_START_INDEX) {
+        action -= USE_START_INDEX;
+
+        type = USE;
+        origin = action / 13;
+        target = (action % 13) - 1; // if zero, then NONE (-1)
+    } else if (action >= SUMMON_START_INDEX) {
+        action -= SUMMON_START_INDEX;
+
+        type = SUMMON;
+        origin = action / 2;
+        target = action % 2;
+    }
+
+    return (Action) {.type = type, .origin = origin, .target = target};
+}
+
 State* copy_state(State* state) {
     State *copied_state = malloc(sizeof(State));
 
