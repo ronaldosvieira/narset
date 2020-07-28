@@ -54,7 +54,10 @@ void init_state(State* state) {
     init_player(&state->player, 0);
     init_player(&state->enemy, 1);
 
+    for (int i = 0; i < CARDS_IN_STATE; i++)
+        state->cards[i].instance_id = -1;
 
+    state->winner = -1;
 }
 
 int main() {
@@ -62,8 +65,6 @@ int main() {
     gettimeofday(&time, NULL);
 
     srand((time.tv_sec * 1000) + (time.tv_usec / 1000));
-
-    load_cards();
 
     State state;
     init_state(&state);
