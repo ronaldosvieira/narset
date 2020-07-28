@@ -76,6 +76,9 @@ typedef struct State {
 
     Card cards[CARDS_IN_STATE];
 
+    int cards_in_hand, cards_in_left_lane, cards_in_right_lane;
+    int cards_in_opp_left_lane, cards_in_opp_right_lane;
+
     int winner;
 } State;
 
@@ -94,6 +97,5 @@ void init_state(State* state);
 Action* get_available_actions(State* state);
 void act_on_state(State* state, Action* action);
 State* copy_state(State* state);
-State* state_from_native_input(char* input);
 
 #endif //NARSET_ENGINE_H

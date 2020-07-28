@@ -1,4 +1,5 @@
 #pragma clang diagnostic push
+#pragma ide diagnostic ignored "cert-err34-c"
 #include "engine.h"
 
 #include <stdio.h>
@@ -69,13 +70,4 @@ State* copy_state(State* state) {
     return copied_state;
 }
 
-int main() {
-    struct timeval time;
-    gettimeofday(&time, NULL);
-
-    srand((time.tv_sec * 1000) + (time.tv_usec / 1000));
-
-    State state;
-    init_state(&state);
-}
 #pragma clang diagnostic pop
