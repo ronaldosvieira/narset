@@ -71,8 +71,7 @@ typedef struct State {
     int turn;
     int current_player;
 
-    Player player;
-    Player opponent;
+    Player players[2];
 
     Card cards[CARDS_IN_STATE];
 

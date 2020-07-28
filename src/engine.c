@@ -53,8 +53,8 @@ void init_state(State* state) {
     state->turn = 1;
     state->current_player = 0;
 
-    init_player(&state->player, 0);
-    init_player(&state->opponent, 1);
+    init_player(&state->players[0], 0);
+    init_player(&state->players[1], 1);
 
     for (int i = 0; i < CARDS_IN_STATE; i++)
         state->cards[i].instance_id = -1;

@@ -11,8 +11,8 @@ State* state_from_native_input() {
     State *state = malloc(sizeof(State));
     init_state(state);
 
-    Player *pl = &state->player;
-    Player *en = &state->opponent;
+    Player *pl = &state->players[0];
+    Player *en = &state->players[1];
 
     // read player info
     scanf("%d%d%d%d%*d", &pl->health, &pl->mana, &pl->deck,
@@ -78,8 +78,8 @@ int main() {
 
     State *state = state_from_native_input();
 
-    Player *p = &state->player;
-    Player *op = &state->opponent;
+    Player *p = &state->players[0];
+    Player *op = &state->players[1];
 
     printf("%d %d\n", state->turn, state->current_player);
     printf("%d %d %d %d %d\n", state->cards_in_hand, state->cards_in_left_lane,
