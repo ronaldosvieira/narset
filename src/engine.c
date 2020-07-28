@@ -33,6 +33,7 @@ void init_player(Player* player, int id) {
     player->base_mana = 0;
     player->bonus_mana = 0;
     player->mana = 0;
+    player->deck = 30;
     player->next_rune = 25;
     player->bonus_draw = 0;
 }

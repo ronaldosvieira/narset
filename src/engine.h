@@ -57,6 +57,7 @@ typedef struct Player {
     int base_mana;
     int bonus_mana;
     int mana;
+    int deck;
     int next_rune;
     int bonus_draw;
 } Player;
