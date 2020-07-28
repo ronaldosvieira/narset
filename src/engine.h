@@ -62,6 +62,9 @@ typedef struct Player {
 } Player;
 
 
+# define MAX_CARDS_HAND 8
+# define MAX_CARDS_LANE 6
+# define CARDS_IN_STATE (MAX_CARDS_HAND + MAX_CARDS_LANE * 4)
 
 typedef struct State {
     int turn;
@@ -70,7 +73,7 @@ typedef struct State {
     Player player;
     Player enemy;
 
-    Card cards[8+6+6];
+    Card cards[CARDS_IN_STATE];
 
     int winner;
 } State;
