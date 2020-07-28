@@ -49,13 +49,13 @@ typedef unsigned char Lane;
 #define LETHAL 4
 #define WARD 5
 
-typedef unsigned int Keyword;
+typedef unsigned char Keyword;
 
 typedef struct Card {
     int id, instance_id;
     CardType type;
     int8 cost, attack, defense, player_hp, enemy_hp, card_draw;
-    unsigned int keywords;
+    unsigned char keywords;
     Location location; Lane lane;
     Bool can_attack;
 } Card;
@@ -91,7 +91,7 @@ typedef struct State {
 } State;
 
 /* Card methods */
-unsigned int has_keyword(Card card, Keyword keyword);
+Bool has_keyword(Card card, Keyword keyword);
 void add_keyword(Card* card, Keyword keyword);
 void remove_keyword(Card* card, Keyword keyword);
 Card* copy_card(Card *card);

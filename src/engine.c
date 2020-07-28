@@ -1,4 +1,5 @@
 #pragma clang diagnostic push
+#pragma ide diagnostic ignored "hicpp-signed-bitwise"
 #pragma ide diagnostic ignored "cert-err34-c"
 #include "engine.h"
 
@@ -7,12 +8,12 @@
 #include <string.h>
 #include <sys/time.h>
 
-unsigned int has_keyword(Card card, Keyword keyword) {
-    return card.keywords >> keyword & (unsigned int) 1;
+Bool has_keyword(Card card, Keyword keyword) {
+    return (card.keywords >> keyword) & (unsigned char) 1;
 }
 
 void add_keyword(Card* card, Keyword keyword) {
-    card->keywords |= (unsigned int) 1 << keyword;
+    card->keywords |= (unsigned char) 1 << keyword;
 }
 
 void remove_keyword(Card* card, Keyword keyword) {
