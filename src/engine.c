@@ -65,10 +65,10 @@ void init_state(State* state) {
 }
 
 void calculate_valid_actions(State* state) {
-    int *actions = state->valid_actions;
+    Bool *actions = state->valid_actions;
 
     // valid actions have already been calculated
-    if (actions[0] != -1) return;
+    if (actions[0] != NONE) return;
 
     // passing is always allowed
     actions[0] = TRUE;

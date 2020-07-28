@@ -15,11 +15,11 @@ State* state_from_native_input() {
     Player *en = &state->players[1];
 
     // read player info
-    scanf("%d%d%d%d%*d", &pl->health, &pl->mana, &pl->deck,
+    scanf("%hhd%hhd%hhd%hhd%*d", &pl->health, &pl->mana, &pl->deck,
             &pl->next_rune);
 
     // read opponent info
-    scanf("%d%d%d%d%d", &en->health, &en->mana, &en->deck,
+    scanf("%hhd%hhd%hhd%hhd%hhd", &en->health, &en->mana, &en->deck,
           &en->next_rune, &en->bonus_draw);
     en->bonus_draw -= 1; // adjust to our meaning of bonus draw
 
@@ -38,10 +38,10 @@ State* state_from_native_input() {
         Card *card = malloc(sizeof(Card));
         char abilities[7];
 
-        scanf("%d%d%d%d%d%d%d%s%d%d%d%d", &card->id, &card->instance_id,
-              &card->location, &card->type, &card->cost, &card->attack,
-              &card->defense, abilities, &card->player_hp, &card->enemy_hp,
-              &card->card_draw, &card->lane);
+        scanf("%d%d%hhd%hhd%hhd%hhd%hhd%s%hhd%hhd%hhd%hhd", &card->id,
+                &card->instance_id, &card->location, &card->type, &card->cost,
+                &card->attack, &card->defense, abilities, &card->player_hp,
+                &card->enemy_hp, &card->card_draw, &card->lane);
 
         for (int j = 0; j < 6; j++)
             if (abilities[j] != '-')
@@ -109,5 +109,7 @@ int main() {
         printf("%d ", state->valid_actions[i]);
     }
     printf("\n");
+
+    printf("%ld\n", sizeof(State));
 }
 #pragma clang diagnostic pop

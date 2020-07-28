@@ -3,8 +3,9 @@
 
 #define FALSE 0
 #define TRUE 1
+#define NONE -1
 
-typedef unsigned char Bool;
+typedef char Bool;
 
 #define PASS 0
 #define PICK 1
@@ -12,11 +13,13 @@ typedef unsigned char Bool;
 #define USE 3
 #define ATTACK 4
 
-typedef int ActionType;
+typedef unsigned char ActionType;
+typedef char int8;
+typedef unsigned char uint8;
 
 typedef struct Action {
     ActionType type;
-    int origin, target;
+    int8 origin, target;
 } Action;
 
 #define CREATURE 0
@@ -24,7 +27,7 @@ typedef struct Action {
 #define RED_ITEM 2
 #define BLUE_ITEM 3
 
-typedef int CardType;
+typedef unsigned char CardType;
 
 #define OUTSIDE -1
 #define P0_HAND 0
@@ -32,12 +35,12 @@ typedef int CardType;
 #define P1_BOARD 14
 #define P1_HAND 20
 
-typedef int Location;
+typedef char Location;
 
 #define LEFT_LANE 0
 #define RIGHT_LANE 3
 
-typedef int Lane;
+typedef unsigned char Lane;
 
 #define BREAKTHROUGH 0
 #define CHARGE 1
@@ -51,21 +54,15 @@ typedef unsigned int Keyword;
 typedef struct Card {
     int id, instance_id;
     CardType type;
-    int cost, attack, defense, player_hp, enemy_hp, card_draw;
+    int8 cost, attack, defense, player_hp, enemy_hp, card_draw;
     unsigned int keywords;
     Location location; Lane lane;
-    int can_attack;
+    Bool can_attack;
 } Card;
 
 typedef struct Player {
-    int id;
-    int health;
-    int base_mana;
-    int bonus_mana;
-    int mana;
-    int deck;
-    int next_rune;
-    int bonus_draw;
+    uint8 id;
+    int8 health, base_mana, bonus_mana, mana, deck, next_rune, bonus_draw;
 } Player;
 
 # define MAX_CARDS_HAND 8
@@ -78,19 +75,19 @@ typedef struct Player {
 #define ATTACK_START_INDEX 121
 
 typedef struct State {
-    int turn;
-    int current_player;
+    uint8 turn;
+    uint8 current_player;
 
     Player players[2];
 
     Card cards[CARDS_IN_STATE];
 
-    int cards_in_hand, cards_in_left_lane, cards_in_right_lane;
-    int cards_in_opp_left_lane, cards_in_opp_right_lane;
+    uint8 cards_in_hand, cards_in_left_lane, cards_in_right_lane;
+    uint8 cards_in_opp_left_lane, cards_in_opp_right_lane;
 
     Bool valid_actions[145];
 
-    int winner;
+    int8 winner;
 } State;
 
 /* Card methods */
