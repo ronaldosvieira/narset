@@ -60,6 +60,14 @@ void init_state(State* state) {
     state->winner = -1;
 }
 
+State* copy_state(State* state) {
+    State *copied_state = malloc(sizeof(State));
+
+    memcpy(copied_state, state, sizeof(State));
+
+    return copied_state;
+}
+
 int main() {
     struct timeval time;
     gettimeofday(&time, NULL);
