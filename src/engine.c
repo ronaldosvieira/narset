@@ -136,6 +136,9 @@ void calculate_valid_actions(State* state) {
 
     // check attacks available for each creature in the left lane
     for (int i = 0; i < state->cards_in_left_lane; i++) {
+        if (!state->cards[P0_BOARD + LEFT_LANE + i].can_attack)
+            continue;
+
         for (int j = 0; j < state->cards_in_opp_left_lane; j++) {
             Card *creature = &state->cards[P1_BOARD + LEFT_LANE + j];
 
@@ -149,6 +152,9 @@ void calculate_valid_actions(State* state) {
 
     // check attacks available for each creature in the right lane
     for (int i = 0; i < state->cards_in_right_lane; i++) {
+        if (!state->cards[P0_BOARD + RIGHT_LANE + i].can_attack)
+            continue;
+
         for (int j = 0; j < state->cards_in_opp_right_lane; j++) {
             Card *creature = &state->cards[P1_BOARD + RIGHT_LANE + j];
 
