@@ -72,7 +72,7 @@ typedef struct State {
     int current_player;
 
     Player player;
-    Player enemy;
+    Player opponent;
 
     Card cards[CARDS_IN_STATE];
 
