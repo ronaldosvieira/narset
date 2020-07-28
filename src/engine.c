@@ -18,10 +18,10 @@ void remove_keyword(Card* card, Keyword keyword) {
     card->keywords &= ~((unsigned int) 1 << keyword);
 }
 
-Card* copy_card(Card card) {
+Card* copy_card(Card *card) {
     Card *copied_card = malloc(sizeof(Card));
 
-    memcpy(copied_card, &card, sizeof(Card));
+    memcpy(copied_card, card, sizeof(Card));
 
     return copied_card;
 }

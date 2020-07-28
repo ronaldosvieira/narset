@@ -82,7 +82,7 @@ typedef struct State {
 unsigned int has_keyword(Card card, Keyword keyword);
 void add_keyword(Card* card, Keyword keyword);
 void remove_keyword(Card* card, Keyword keyword);
-Card* copy_card(Card card);
+Card* copy_card(Card *card);
 
 /* Player methods */
 void init_player(Player* player, int id);
