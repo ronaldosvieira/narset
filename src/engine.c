@@ -298,7 +298,8 @@ void act_on_state(State* state, uint8 action_index) {
         default: do_pass(state); break;
     }
 
-    // nullify valid actions
+    // nullify valid actions array
+    memset(state->valid_actions, (Bool) 0, sizeof(state->valid_actions));
     state->valid_actions[0] = NONE;
 
     // remove any dead creatures
@@ -311,10 +312,6 @@ void act_on_state(State* state, uint8 action_index) {
         state->winner = 1;
     else if (state->players[1].health <= 0)
         state->winner = 0;
-
-    // if there's a winner, make all actions invalid
-    if (state->winner != NONE)
-        memset(state->valid_actions, (Bool) 0, sizeof(state->valid_actions));
 }
 
 State* copy_state(State* state) {
