@@ -53,11 +53,15 @@ State* state_from_native_input() {
         if (card->location == 0)
             card_position = P0_HAND + state->cards_in_hand++;
         else if (card->location == 1) {
+            card->can_attack = TRUE;
+
             if (card->lane == 0)
                 card_position = P0_BOARD + LEFT_LANE + state->cards_in_left_lane++;
             else if (card->lane == 1)
                 card_position = P0_BOARD + RIGHT_LANE + state->cards_in_right_lane++;
         } else if (card->location == -1) {
+            card->can_attack = TRUE;
+
             if (card->lane == 0)
                 card_position = P1_BOARD + LEFT_LANE + state->cards_in_opp_left_lane++;
             else if (card->lane == 1)
