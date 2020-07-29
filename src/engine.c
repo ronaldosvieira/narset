@@ -286,6 +286,27 @@ void do_pass(State* state) {
     // todo: implement
 }
 
+int remove_dead_creatures(Card lane[], int board_size) {
+    int dead_creatures = 0;
+    int last_alive_creature = -1;
+
+    for (int i = 0; i < board_size; i++) {
+        if (lane[i].defense <= 0) {
+            lane[i].id = NONE;
+            dead_creatures++;
+        } else {
+            if (last_alive_creature != i - 1) {
+                lane[last_alive_creature + 1] = lane[i];
+                lane[i].id = NONE;
+            }
+
+            last_alive_creature = i;
+        }
+    }
+
+    return dead_creatures;
+}
+
 void act_on_state(State* state, uint8 action_index) {
     // find action type, origin and target from index
     Action action = decode_action(action_index);
@@ -303,9 +324,14 @@ void act_on_state(State* state, uint8 action_index) {
     state->valid_actions[0] = NONE;
 
     // remove any dead creatures
-    for (int i = P0_BOARD; i < P1_HAND; i++)
-        if (state->cards[i].defense <= 0)
-            state->cards[i].id = NONE;
+    state->cards_in_left_lane -= remove_dead_creatures(
+            &state->cards[P0_BOARD + LEFT_LANE], MAX_CARDS_SINGLE_LANE);
+    state->cards_in_right_lane -= remove_dead_creatures(
+            &state->cards[P0_BOARD + RIGHT_LANE], MAX_CARDS_SINGLE_LANE);
+    state->cards_in_opp_left_lane -= remove_dead_creatures(
+            &state->cards[P1_BOARD + LEFT_LANE], MAX_CARDS_SINGLE_LANE);
+    state->cards_in_opp_right_lane -= remove_dead_creatures(
+            &state->cards[P1_BOARD + RIGHT_LANE], MAX_CARDS_SINGLE_LANE);
 
     // declare a winner, if there's any
     if (state->players[0].health <= 0)
