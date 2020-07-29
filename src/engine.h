@@ -99,7 +99,7 @@ Card* copy_card(Card *card);
 
 /* Player methods */
 void init_player(Player* player, int id);
-void damage_player(Player* player, int amount);
+int8 damage_player(Player* player, int8 amount);
 
 /* State methods */
 void init_state(State* state);
