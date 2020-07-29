@@ -20,6 +20,20 @@ void remove_keyword(Card* card, Keyword keyword) {
     card->keywords &= ~((unsigned int) 1 << keyword);
 }
 
+int8 damage_creature(Card* creature, int8 amount) {
+    if (amount <= 0) return (int8) 0;
+
+    if (has_keyword(*creature, WARD)) {
+        remove_keyword(creature, WARD);
+
+        return (int8) 0;
+    }
+
+    creature->defense -= amount;
+
+    return amount;
+}
+
 Card* copy_card(Card *card) {
     Card *copied_card = malloc(sizeof(Card));
 

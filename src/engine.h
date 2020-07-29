@@ -94,6 +94,7 @@ typedef struct State {
 Bool has_keyword(Card card, Keyword keyword);
 void add_keyword(Card* card, Keyword keyword);
 void remove_keyword(Card* card, Keyword keyword);
+int8 damage_creature(Card* creature, int8 amount);
 Card* copy_card(Card *card);
 
 /* Player methods */
