@@ -250,7 +250,36 @@ void do_use(State* state, int8 origin, int8 target) {
     // todo: implement
 }
 void do_attack(State* state, int8 origin, int8 target) {
-    // todo: implement
+    Card *attacker = &state->cards[P0_BOARD + origin];
+    int8 damage_dealt;
+
+    if (target == NONE) { // if target is the opponent
+        damage_dealt = damage_player(state->opposing_player, attacker->attack);
+    } else { // if target is a creature
+        Card *defender = &state->cards[P1_BOARD + target];
+        int8 old_target_defense = defender->defense;
+
+        // deal damage to defender
+        damage_dealt = damage_creature(defender, attacker->attack);
+        if (has_keyword(*attacker, LETHAL)) defender->defense = 0;
+
+        // deal damage to attacker
+        damage_creature(attacker, defender->attack);
+        if (has_keyword(*defender, LETHAL)) attacker->defense = 0;
+
+        // deal damage to opponent if attacker has breakthrough
+        int8 excess_damage = damage_dealt - old_target_defense;
+
+        if (has_keyword(*attacker, BREAKTHROUGH) && excess_damage > 0)
+            damage_player(state->opposing_player, excess_damage);
+    }
+
+    // heal player if attacker has drain
+    if (has_keyword(*attacker, DRAIN))
+        state->current_player->health += damage_dealt;
+
+    // prevent the creature from attacking again this turn
+    attacker->can_attack = FALSE;
 }
 
 void do_pass(State* state) {
