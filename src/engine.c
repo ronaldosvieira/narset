@@ -242,8 +242,10 @@ void do_pass(State* state) {
 }
 
 void act_on_state(State* state, uint8 action_index) {
+    // find action type, origin and target from index
     Action action = decode_action(action_index);
 
+    // execute the action appropriately
     switch (action.type) {
         case SUMMON: do_summon(state, action.origin, action.target); break;
         case USE: do_use(state, action.origin, action.target); break;
@@ -251,7 +253,23 @@ void act_on_state(State* state, uint8 action_index) {
         default: do_pass(state); break;
     }
 
+    // nullify valid actions
     state->valid_actions[0] = NONE;
+
+    // remove any dead creatures
+    for (int i = P0_BOARD; i < P1_HAND; i++)
+        if (state->cards[i].defense <= 0)
+            state->cards[i].id = NONE;
+
+    // declare a winner, if there's any
+    if (state->players[0].health <= 0)
+        state->winner = 1;
+    else if (state->players[1].health <= 0)
+        state->winner = 0;
+
+    // if there's a winner, make all actions invalid
+    if (state->winner != NONE)
+        memset(state->valid_actions, (Bool) 0, sizeof(state->valid_actions));
 }
 
 State* copy_state(State* state) {
