@@ -196,7 +196,37 @@ Action decode_action(uint8 action) {
 }
 
 void do_summon(State* state, int8 origin, int8 lane) {
-    // todo: implement
+    // copy card
+    Card creature = state->cards[P0_HAND + origin];
+
+    // spend mana
+    state->players[state->current_player].mana -= creature.cost;
+
+    // remove card from hand
+    for (int i = P0_HAND + origin + 1; i < P0_HAND + state->cards_in_hand; i++)
+        state->cards[i - 1] = state->cards[i];
+
+    state->cards[P0_HAND + state->cards_in_hand - 1].id = NONE;
+
+    state->cards_in_hand--;
+
+    // if the creature has charge, let it attack immediately
+    if (has_keyword(creature, CHARGE))
+        creature.can_attack = TRUE;
+
+    // add creature to board
+    if (lane == 0) {
+        state->cards[P0_BOARD + LEFT_LANE + state->cards_in_left_lane] = creature;
+        state->cards_in_left_lane++;
+    } else {
+        state->cards[P0_BOARD + RIGHT_LANE + state->cards_in_right_lane] = creature;
+        state->cards_in_right_lane++;
+    }
+
+    // trigger enter-the-board abilities
+    state->players[state->current_player].bonus_draw += creature.card_draw;
+    damage_player(&state->players[state->current_player], -creature.player_hp);
+    damage_player(&state->players[(state->current_player + 1) % 2], -creature.enemy_hp);
 }
 
 void do_use(State* state, int8 origin, int8 target) {
