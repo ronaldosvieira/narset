@@ -52,10 +52,12 @@ void damage_player(Player* player, int amount) {
 
 void init_state(State* state) {
     state->turn = 1;
-    state->current_player = 0;
 
     init_player(&state->players[0], 0);
     init_player(&state->players[1], 1);
+
+    state->current_player = &state->players[0];
+    state->opposing_player = &state->players[1];
 
     for (int i = 0; i < CARDS_IN_STATE; i++)
         state->cards[i].instance_id = -1;
@@ -77,14 +79,13 @@ void calculate_valid_actions(State* state) {
     // control variables
     int left_lane_is_full = state->cards_in_left_lane >= MAX_CARDS_SINGLE_LANE;
     int right_lane_is_full = state->cards_in_right_lane >= MAX_CARDS_SINGLE_LANE;
-    int current_player = state->current_player;
 
     // check actions available for each card in hand
     for (int i = 0; i < state->cards_in_hand; i++) {
         Card *card = &state->cards[P0_HAND + i];
 
         // check if player has mana to cast it
-        if (card->cost > state->players[current_player].mana)
+        if (card->cost > state->current_player->mana)
             continue; // if not, ignores the card
 
         // enable appropriated actions for the card's type
@@ -200,7 +201,7 @@ void do_summon(State* state, int8 origin, int8 lane) {
     Card creature = state->cards[P0_HAND + origin];
 
     // spend mana
-    state->players[state->current_player].mana -= creature.cost;
+    state->current_player->mana -= creature.cost;
 
     // remove card from hand
     for (int i = P0_HAND + origin + 1; i < P0_HAND + state->cards_in_hand; i++)
@@ -224,9 +225,9 @@ void do_summon(State* state, int8 origin, int8 lane) {
     }
 
     // trigger enter-the-board abilities
-    state->players[state->current_player].bonus_draw += creature.card_draw;
-    damage_player(&state->players[state->current_player], -creature.player_hp);
-    damage_player(&state->players[(state->current_player + 1) % 2], -creature.enemy_hp);
+    state->current_player->bonus_draw += creature.card_draw;
+    damage_player(state->current_player, -creature.player_hp);
+    damage_player(state->opposing_player, -creature.enemy_hp);
 }
 
 void do_use(State* state, int8 origin, int8 target) {

@@ -76,7 +76,7 @@ typedef struct Player {
 
 typedef struct State {
     uint8 turn;
-    uint8 current_player;
+    Player *current_player, *opposing_player;
 
     Player players[2];
 

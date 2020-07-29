@@ -81,7 +81,7 @@ int main() {
     Player *p = &state->players[0];
     Player *op = &state->players[1];
 
-    printf("%d %d\n", state->turn, state->current_player);
+    printf("%d %d\n", state->turn, state->current_player->id);
     printf("%d %d %d %d %d\n", state->cards_in_hand, state->cards_in_left_lane,
             state->cards_in_right_lane, state->cards_in_opp_left_lane,
             state->cards_in_opp_right_lane);
