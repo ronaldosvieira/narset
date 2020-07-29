@@ -247,8 +247,57 @@ void do_summon(State* state, int8 origin, int8 lane) {
 }
 
 void do_use(State* state, int8 origin, int8 target) {
-    // todo: implement
+    // copy card
+    Card item = state->cards[P0_HAND + origin];
+
+    // spend mana
+    state->current_player->mana -= item.cost;
+
+    // remove card from hand
+    for (int i = P0_HAND + origin + 1; i < P0_HAND + state->cards_in_hand; i++)
+        state->cards[i - 1] = state->cards[i];
+
+    state->cards[P0_HAND + state->cards_in_hand - 1].id = NONE;
+
+    state->cards_in_hand--;
+
+    Card *creature;
+
+    switch (item.type) {
+        case GREEN_ITEM:
+            creature = &state->cards[P0_BOARD + target];
+
+            creature->attack += item.attack; // increase attack
+            creature->defense += item.defense; // increase defense
+            creature->keywords |= item.keywords; // add keywords
+
+            break;
+        case BLUE_ITEM:
+            if (target == NONE) {
+                damage_player(state->opposing_player, -item.defense); // damage opponent
+
+                break;
+            } // otherwise treat as a red item
+        case RED_ITEM:
+            creature = &state->cards[P1_BOARD + target];
+
+            creature->attack -= item.attack; // decrease attack
+            damage_creature(creature, -item.defense); // decrease defense
+            creature->keywords &= ~(creature->keywords & item.keywords); // remove keywords
+
+            // ensure that the attack attribute is non-negative
+            if (creature->attack < 0)
+                creature->attack = 0;
+
+            break;
+    }
+
+    // trigger enter-the-board abilities
+    state->current_player->bonus_draw += item.card_draw;
+    damage_player(state->current_player, -item.player_hp);
+    damage_player(state->opposing_player, -item.enemy_hp);
 }
+
 void do_attack(State* state, int8 origin, int8 target) {
     Card *attacker = &state->cards[P0_BOARD + origin];
     int8 damage_dealt;
