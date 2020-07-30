@@ -49,7 +49,7 @@ void init_player(Player* player, int id) {
     player->base_mana = 1;
     player->bonus_mana = 0;
     player->mana = 1;
-    player->deck = 30;
+    player->deck_size = 30;
     player->next_rune = 25;
     player->bonus_draw = 0;
 }
@@ -388,7 +388,7 @@ void do_pass(State* state) {
     player->mana = player->base_mana + player->bonus_mana;
 
     // if it's past the fiftieth round, decks are considered to be empty
-    if (state->round > 50) player->deck = 0;
+    if (state->round > 50) player->deck_size = 0;
 
     // calculate amount of cards to draw this round
     int amount_to_draw = 1 + player->bonus_draw;
@@ -399,10 +399,10 @@ void do_pass(State* state) {
         if (player->hand_size >= MAX_CARDS_HAND)
             break;
 
-        if (player->deck > 0) { // if there are still cards to draw, then do it
+        if (player->deck_size > 0) { // if there are still cards to draw, then do it
             player_hand[player->hand_size++] =
                     (Card) {.id = UNKNOWN, .instance_id = UNKNOWN, .cost = 1};
-            player->deck--;
+            player->deck_size--;
         } else { // else, damage the player to the closest rune
             damage_player(player, player->health - player->next_rune);
         }

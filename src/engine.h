@@ -60,8 +60,8 @@ typedef struct Card {
 
 typedef struct Player {
     uint8 id;
-    int8 health, base_mana, bonus_mana, mana, deck, next_rune, bonus_draw;
-    uint8 hand_size, left_lane_size, right_lane_size;
+    int8 health, base_mana, bonus_mana, mana, next_rune, bonus_draw;
+    uint8 deck_size, hand_size, left_lane_size, right_lane_size;
 } Player;
 
 # define MAX_CARDS_HAND 8
