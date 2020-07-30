@@ -99,8 +99,8 @@ void calculate_valid_actions(State* state) {
     actions[0] = TRUE;
 
     // control variables
-    int left_lane_is_full = player->left_lane >= MAX_CARDS_SINGLE_LANE;
-    int right_lane_is_full = player->right_lane >= MAX_CARDS_SINGLE_LANE;
+    int left_lane_is_full = player->left_lane >= MAX_CARDS_LANE;
+    int right_lane_is_full = player->right_lane >= MAX_CARDS_LANE;
 
     // check actions available for each card in hand
     for (int i = 0; i < player->hand; i++) {
@@ -403,13 +403,13 @@ void act_on_state(State* state, uint8 action_index) {
 
     // remove any dead creatures
     player->left_lane -= remove_dead_creatures(
-            &player_board[LEFT_LANE], MAX_CARDS_SINGLE_LANE);
+            &player_board[LEFT_LANE], MAX_CARDS_LANE);
     player->right_lane -= remove_dead_creatures(
-            &player_board[RIGHT_LANE], MAX_CARDS_SINGLE_LANE);
+            &player_board[RIGHT_LANE], MAX_CARDS_LANE);
     opponent->left_lane -= remove_dead_creatures(
-            &opp_board[LEFT_LANE], MAX_CARDS_SINGLE_LANE);
+            &opp_board[LEFT_LANE], MAX_CARDS_LANE);
     opponent->right_lane -= remove_dead_creatures(
-            &opp_board[RIGHT_LANE], MAX_CARDS_SINGLE_LANE);
+            &opp_board[RIGHT_LANE], MAX_CARDS_LANE);
 
     // declare a winner, if there's any
     if (state->players[0].health <= 0)
