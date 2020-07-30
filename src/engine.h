@@ -63,6 +63,7 @@ typedef struct Card {
 typedef struct Player {
     uint8 id;
     int8 health, base_mana, bonus_mana, mana, deck, next_rune, bonus_draw;
+    uint8 hand, left_lane, right_lane;
 } Player;
 
 # define MAX_CARDS_HAND 8
@@ -81,9 +82,6 @@ typedef struct State {
     Player players[2];
 
     Card cards[CARDS_IN_STATE];
-
-    uint8 cards_in_hand, cards_in_left_lane, cards_in_right_lane;
-    uint8 cards_in_opp_left_lane, cards_in_opp_right_lane;
 
     Bool valid_actions[145];
 

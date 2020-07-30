@@ -47,28 +47,28 @@ State* state_from_native_input() {
             if (abilities[j] != '-')
                 add_keyword(card, j);
 
-        int card_position = -1;
+        int position = -1;
 
         // get position to add new card and increment appropriate counter
         if (card->location == 0)
-            card_position = P0_HAND + state->cards_in_hand++;
+            position = P0_HAND + state->current_player->hand++;
         else if (card->location == 1) {
             card->can_attack = TRUE;
 
             if (card->lane == 0)
-                card_position = P0_BOARD + LEFT_LANE + state->cards_in_left_lane++;
+                position = P0_BOARD + LEFT_LANE + state->current_player->left_lane++;
             else if (card->lane == 1)
-                card_position = P0_BOARD + RIGHT_LANE + state->cards_in_right_lane++;
+                position = P0_BOARD + RIGHT_LANE + state->current_player->right_lane++;
         } else if (card->location == -1) {
             card->can_attack = TRUE;
 
             if (card->lane == 0)
-                card_position = P1_BOARD + LEFT_LANE + state->cards_in_opp_left_lane++;
+                position = P1_BOARD + LEFT_LANE + state->opposing_player->left_lane++;
             else if (card->lane == 1)
-                card_position = P1_BOARD + RIGHT_LANE + state->cards_in_opp_right_lane++;
+                position = P1_BOARD + RIGHT_LANE + state->opposing_player->right_lane++;
         }
 
-        state->cards[card_position] = *card;
+        state->cards[position] = *card;
     }
 
     return state;
@@ -82,13 +82,12 @@ int main() {
 
     State *state = state_from_native_input();
 
-    Player *p = &state->players[0];
-    Player *op = &state->players[1];
+    Player *p = state->current_player;
+    Player *op = state->opposing_player;
 
     printf("%d %d\n", state->turn, state->current_player->id);
-    printf("%d %d %d %d %d\n", state->cards_in_hand, state->cards_in_left_lane,
-            state->cards_in_right_lane, state->cards_in_opp_left_lane,
-            state->cards_in_opp_right_lane);
+    printf("%d %d %d %d %d\n", p->hand, p->left_lane, p->right_lane,
+           op->left_lane, op->right_lane);
     printf("%d %d %d %d %d\n", p->health, p->mana, p->deck,
             p->next_rune, p->bonus_draw);
     printf("%d %d %d %d %d\n", op->health, op->mana, op->deck,
