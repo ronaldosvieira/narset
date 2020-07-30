@@ -34,14 +34,6 @@ int8 damage_creature(Card* creature, int8 amount) {
     return amount;
 }
 
-Card* copy_card(Card *card) {
-    Card *copied_card = malloc(sizeof(Card));
-
-    memcpy(copied_card, card, sizeof(Card));
-
-    return copied_card;
-}
-
 /* Player methods */
 void init_player(Player* player, int id) {
     player->id = id;
