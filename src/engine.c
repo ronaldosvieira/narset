@@ -80,7 +80,7 @@ void init_state(State* state) {
     state->winner = -1;
 }
 
-void calculate_valid_actions(State* state) {
+int8 calculate_valid_actions(State* state) {
     // initialize shortcuts
     Player *player = state->current_player;
     Player *opponent = state->opposing_player;
@@ -89,8 +89,15 @@ void calculate_valid_actions(State* state) {
     Card *player_board = &state->cards[player->id == 0? P0_BOARD : P1_BOARD];
     Card *opp_board = &state->cards[player->id == 0? P1_BOARD : P0_BOARD];
 
+    // initialize amount of valid actions
+    int8 amount = 0;
+
     // valid actions have already been calculated
-    if (actions[0] != NONE) return;
+    if (actions[0] != NONE) {
+        for (int i = 0; i < 97; i++) amount += actions[i];
+
+        return amount;
+    }
 
     // passing is always allowed
     actions[0] = TRUE;
@@ -185,6 +192,10 @@ void calculate_valid_actions(State* state) {
         if (!has_guard_in_right_lane)
             actions[ATTACK_START_INDEX + (i + 3) * 4 + 0] = TRUE;
     }
+
+    for (int i = 0; i < 97; i++) amount += actions[i];
+
+    return amount;
 }
 
 Action decode_action(uint8 action) {
