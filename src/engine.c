@@ -46,9 +46,9 @@ Card* copy_card(Card *card) {
 void init_player(Player* player, int id) {
     player->id = id;
     player->health = 30;
-    player->base_mana = 0;
+    player->base_mana = 1;
     player->bonus_mana = 0;
-    player->mana = 0;
+    player->mana = 1;
     player->deck = 30;
     player->next_rune = 25;
     player->bonus_draw = 0;
@@ -81,6 +81,8 @@ void init_state(State* state) {
     state->valid_actions[0] = NONE;
 
     state->winner = -1;
+
+    state->players[1].bonus_draw = 1;
 }
 
 void calculate_valid_actions(State* state) {

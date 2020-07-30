@@ -18,13 +18,15 @@ State* state_from_native_input() {
     Card *opp_board = &state->cards[pl->id == 0? P1_BOARD : P0_BOARD];
 
     // read player info
-    scanf("%hhd%hhd%hhd%hhd%*d", &pl->health, &pl->mana, &pl->deck,
+    scanf("%hhd%hhd%hhd%hhd%*d", &pl->health, &pl->base_mana, &pl->deck,
             &pl->next_rune);
+    pl->mana = pl->base_mana;
 
     // read opponent info
-    scanf("%hhd%hhd%hhd%hhd%hhd", &en->health, &en->mana, &en->deck,
+    scanf("%hhd%hhd%hhd%hhd%hhd", &en->health, &en->base_mana, &en->deck,
           &en->next_rune, &en->bonus_draw);
     en->bonus_draw -= 1; // adjust to our meaning of bonus draw
+    en->mana = en->base_mana;
 
     // read amount of cards in opponent's hand and past actions
     int op_hand, op_actions;
