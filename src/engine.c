@@ -354,7 +354,57 @@ void do_attack(State* state, int8 origin, int8 target) {
 }
 
 void do_pass(State* state) {
-    // todo: implement
+    // update player pointers
+    state->current_player = &state->players[(state->current_player->id + 1) % 2];
+    state->opposing_player = &state->players[(state->opposing_player->id + 1) % 2];
+
+    // initialize shortcuts
+    Player *player = state->current_player;
+    Card *player_board = &state->cards[player->id == 0? P0_BOARD : P1_BOARD];
+
+    // if it's first player's turn, then it's a new round
+    if (player->id == 0) state->round++;
+
+    // all creatures are able to attack
+    for (int i = 0; i < 3; i++) {
+        if (i < player->left_lane) player_board[LEFT_LANE + i].can_attack = TRUE;
+        if (i < player->right_lane) player_board[RIGHT_LANE + i].can_attack = TRUE;
+    }
+
+    // if the player spent all their mana then they spent any bonus mana
+    if (player->base_mana > 0 && player->mana == 0)
+        player->bonus_mana = 0;
+
+    // the base mana is increased every round up to 12
+    if (player->base_mana < 12)
+        player->base_mana++;
+
+    // regenerate the player's mana
+    player->mana = player->base_mana + player->bonus_mana;
+
+    // if it's past the fiftieth round, decks are considered to be empty
+    if (state->round > 50) player->deck = 0;
+
+    // calculate amount of cards to draw this round
+    int amount_to_draw = 1 + player->bonus_draw;
+
+    // perform the draws
+    while (amount_to_draw-- > 0) {
+        // if the hand is full, cancel
+        if (player->hand >= MAX_CARDS_HAND)
+            break;
+
+        if (player->deck > 0) { // if there are still cards to draw, then do it
+            // todo: implement actual drawing
+
+            player->deck--;
+        } else { // else, damage the player to the closest rune
+            damage_player(player, player->health - player->next_rune);
+        }
+    }
+
+    // reset the bonus draws
+    player->bonus_draw = 0;
 }
 
 int remove_dead_creatures(Card lane[], int board_size) {
