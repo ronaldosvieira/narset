@@ -76,7 +76,7 @@ void init_state(State* state) {
     state->opposing_player = &state->players[1];
 
     for (int i = 0; i < CARDS_IN_STATE; i++)
-        state->cards[i].instance_id = -1;
+        state->cards[i].id = -1;
 
     state->valid_actions[0] = NONE;
 
