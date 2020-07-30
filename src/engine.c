@@ -101,11 +101,11 @@ void calculate_valid_actions(State* state) {
     actions[0] = TRUE;
 
     // control variables
-    int left_lane_is_full = player->left_lane >= MAX_CARDS_LANE;
-    int right_lane_is_full = player->right_lane >= MAX_CARDS_LANE;
+    int left_lane_is_full = player->left_lane_size >= MAX_CARDS_LANE;
+    int right_lane_is_full = player->right_lane_size >= MAX_CARDS_LANE;
 
     // check actions available for each card in hand
-    for (int i = 0; i < player->hand; i++) {
+    for (int i = 0; i < player->hand_size; i++) {
         Card *card = &player_hand[i];
 
         // check if player has mana to cast it
@@ -124,10 +124,10 @@ void calculate_valid_actions(State* state) {
                 break;
 
             case GREEN_ITEM:
-                for (int j = 0; j < player->left_lane; j++)
+                for (int j = 0; j < player->left_lane_size; j++)
                     actions[USE_START_INDEX + i * 7 + 1 + j] = TRUE;
 
-                for (int j = 0; j < player->right_lane; j++)
+                for (int j = 0; j < player->right_lane_size; j++)
                     actions[USE_START_INDEX + i * 7 + 4 + j] = TRUE;
 
                 break;
@@ -136,10 +136,10 @@ void calculate_valid_actions(State* state) {
                 actions[USE_START_INDEX + i * 7 + 0] = TRUE;
 
             case RED_ITEM:
-                for (int j = 0; j < opponent->left_lane; j++)
+                for (int j = 0; j < opponent->left_lane_size; j++)
                     actions[USE_START_INDEX + i * 7 + 1 + j] = TRUE;
 
-                for (int j = 0; j < opponent->right_lane; j++)
+                for (int j = 0; j < opponent->right_lane_size; j++)
                     actions[USE_START_INDEX + i * 7 + 4 + j] = TRUE;
 
                 break;
@@ -150,21 +150,21 @@ void calculate_valid_actions(State* state) {
     int has_guard_in_right_lane = FALSE;
 
     // check if there are guards in the left lane
-    for (int j = 0; j < opponent->left_lane; j++)
+    for (int j = 0; j < opponent->left_lane_size; j++)
         if (has_keyword(opp_board[LEFT_LANE + j], GUARD))
             has_guard_in_left_lane = TRUE;
 
     // check if there are guards in the right lane
-    for (int j = 0; j < opponent->right_lane; j++)
+    for (int j = 0; j < opponent->right_lane_size; j++)
         if (has_keyword(opp_board[RIGHT_LANE + j], GUARD))
             has_guard_in_right_lane = TRUE;
 
     // check attacks available for each creature in the left lane
-    for (int i = 0; i < player->left_lane; i++) {
+    for (int i = 0; i < player->left_lane_size; i++) {
         if (!player_board[LEFT_LANE + i].can_attack)
             continue;
 
-        for (int j = 0; j < opponent->left_lane; j++) {
+        for (int j = 0; j < opponent->left_lane_size; j++) {
             Card *creature = &opp_board[LEFT_LANE + j];
 
             if (!has_guard_in_left_lane || has_keyword(*creature, GUARD))
@@ -176,11 +176,11 @@ void calculate_valid_actions(State* state) {
     }
 
     // check attacks available for each creature in the right lane
-    for (int i = 0; i < player->right_lane; i++) {
+    for (int i = 0; i < player->right_lane_size; i++) {
         if (!player_board[RIGHT_LANE + i].can_attack)
             continue;
 
-        for (int j = 0; j < opponent->right_lane; j++) {
+        for (int j = 0; j < opponent->right_lane_size; j++) {
             Card *creature = &opp_board[RIGHT_LANE + j];
 
             if (!has_guard_in_right_lane || has_keyword(*creature, GUARD))
@@ -234,11 +234,10 @@ void do_summon(State* state, int8 origin, int8 lane) {
     state->current_player->mana -= creature.cost;
 
     // remove card from hand
-    for (int i = origin + 1; i < player->hand; i++)
+    for (int i = origin + 1; i < player->hand_size; i++)
         player_hand[i - 1] = player_hand[i];
 
-    player_hand[player->hand - 1].id = NONE;
-    player->hand--;
+    player_hand[--player->hand_size].id = NONE;
 
     // if the creature has charge, let it attack immediately
     if (has_keyword(creature, CHARGE))
@@ -246,9 +245,9 @@ void do_summon(State* state, int8 origin, int8 lane) {
 
     // add creature to board
     if (lane == 0)
-        player_board[LEFT_LANE + player->left_lane++] = creature;
+        player_board[LEFT_LANE + player->left_lane_size++] = creature;
     else
-        player_board[RIGHT_LANE + player->right_lane++] = creature;
+        player_board[RIGHT_LANE + player->right_lane_size++] = creature;
 
     // trigger enter-the-board abilities
     player->bonus_draw += creature.card_draw;
@@ -271,11 +270,10 @@ void do_use(State* state, int8 origin, int8 target) {
     player->mana -= item.cost;
 
     // remove card from hand
-    for (int i = origin + 1; i < player->hand; i++)
+    for (int i = origin + 1; i < player->hand_size; i++)
         player_hand[i - 1] = player_hand[i];
 
-    player_hand[player->hand - 1].id = NONE;
-    player->hand--;
+    player_hand[--player->hand_size].id = NONE;
 
     Card *creature;
 
@@ -367,8 +365,11 @@ void do_pass(State* state) {
 
     // all creatures are able to attack
     for (int i = 0; i < 3; i++) {
-        if (i < player->left_lane) player_board[LEFT_LANE + i].can_attack = TRUE;
-        if (i < player->right_lane) player_board[RIGHT_LANE + i].can_attack = TRUE;
+        if (i < player->left_lane_size)
+            player_board[LEFT_LANE + i].can_attack = TRUE;
+
+        if (i < player->right_lane_size)
+            player_board[RIGHT_LANE + i].can_attack = TRUE;
     }
 
     // if the player spent all their mana then they spent any bonus mana
@@ -391,7 +392,7 @@ void do_pass(State* state) {
     // perform the draws
     while (amount_to_draw-- > 0) {
         // if the hand is full, cancel
-        if (player->hand >= MAX_CARDS_HAND)
+        if (player->hand_size >= MAX_CARDS_HAND)
             break;
 
         if (player->deck > 0) { // if there are still cards to draw, then do it
@@ -454,13 +455,13 @@ void act_on_state(State* state, uint8 action_index) {
     state->valid_actions[0] = NONE;
 
     // remove any dead creatures
-    player->left_lane -= remove_dead_creatures(
+    player->left_lane_size -= remove_dead_creatures(
             &player_board[LEFT_LANE], MAX_CARDS_LANE);
-    player->right_lane -= remove_dead_creatures(
+    player->right_lane_size -= remove_dead_creatures(
             &player_board[RIGHT_LANE], MAX_CARDS_LANE);
-    opponent->left_lane -= remove_dead_creatures(
+    opponent->left_lane_size -= remove_dead_creatures(
             &opp_board[LEFT_LANE], MAX_CARDS_LANE);
-    opponent->right_lane -= remove_dead_creatures(
+    opponent->right_lane_size -= remove_dead_creatures(
             &opp_board[RIGHT_LANE], MAX_CARDS_LANE);
 
     // declare a winner, if there's any

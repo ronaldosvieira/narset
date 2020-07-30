@@ -54,21 +54,21 @@ State* state_from_native_input() {
 
         // add new card and increment appropriate counter
         if (card->location == 0)
-            player_hand[state->current_player->hand++] = *card;
+            player_hand[state->current_player->hand_size++] = *card;
         else if (card->location == 1) {
             card->can_attack = TRUE;
 
             if (card->lane == 0)
-                player_board[LEFT_LANE + state->current_player->left_lane++] = *card;
+                player_board[LEFT_LANE + state->current_player->left_lane_size++] = *card;
             else if (card->lane == 1)
-                player_board[RIGHT_LANE + state->current_player->right_lane++] = *card;
+                player_board[RIGHT_LANE + state->current_player->right_lane_size++] = *card;
         } else if (card->location == -1) {
             card->can_attack = TRUE;
 
             if (card->lane == 0)
-                opp_board[LEFT_LANE + state->opposing_player->left_lane++] = *card;
+                opp_board[LEFT_LANE + state->opposing_player->left_lane_size++] = *card;
             else if (card->lane == 1)
-                opp_board[RIGHT_LANE + state->opposing_player->right_lane++] = *card;
+                opp_board[RIGHT_LANE + state->opposing_player->right_lane_size++] = *card;
         }
     }
 
@@ -87,8 +87,8 @@ int main() {
     Player *op = state->opposing_player;
 
     printf("%d %d\n", state->round, state->current_player->id);
-    printf("%d %d %d %d %d\n", p->hand, p->left_lane, p->right_lane,
-           op->left_lane, op->right_lane);
+    printf("%d %d %d %d %d\n", p->hand_size, p->left_lane_size,
+           p->right_lane_size, op->left_lane_size, op->right_lane_size);
     printf("%d %d %d %d %d\n", p->health, p->mana, p->deck,
             p->next_rune, p->bonus_draw);
     printf("%d %d %d %d %d\n", op->health, op->mana, op->deck,
