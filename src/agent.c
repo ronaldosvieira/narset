@@ -99,7 +99,7 @@ void state_to_native_input(State* state) {
 
     // print amount of cards
     printf("%d\n", pl->hand_size + pl->left_lane_size + pl->right_lane_size +
-            op->hand_size + op->left_lane_size + op->right_lane_size);
+            op->left_lane_size + op->right_lane_size);
 
     // print cards in current player's hand
     for (int i = 0; i < pl->hand_size; i++) {
