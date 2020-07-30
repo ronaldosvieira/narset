@@ -73,7 +73,7 @@ typedef struct Player {
 
 #define SUMMON_START_INDEX 1
 #define USE_START_INDEX 17
-#define ATTACK_START_INDEX 121
+#define ATTACK_START_INDEX 73
 
 typedef struct State {
     uint8 turn;
@@ -83,7 +83,7 @@ typedef struct State {
 
     Card cards[CARDS_IN_STATE];
 
-    Bool valid_actions[145];
+    Bool valid_actions[97];
 
     int8 winner;
 } State;

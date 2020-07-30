@@ -123,22 +123,22 @@ void calculate_valid_actions(State* state) {
 
             case GREEN_ITEM:
                 for (int j = 0; j < player->left_lane; j++)
-                    actions[USE_START_INDEX + i * 13 + 1 + j] = TRUE;
+                    actions[USE_START_INDEX + i * 7 + 1 + j] = TRUE;
 
                 for (int j = 0; j < player->right_lane; j++)
-                    actions[USE_START_INDEX + i * 13 + 4 + j] = TRUE;
+                    actions[USE_START_INDEX + i * 7 + 4 + j] = TRUE;
 
                 break;
 
             case BLUE_ITEM:
-                actions[USE_START_INDEX + i * 13 + 0] = TRUE;
+                actions[USE_START_INDEX + i * 7 + 0] = TRUE;
 
             case RED_ITEM:
                 for (int j = 0; j < opponent->left_lane; j++)
-                    actions[USE_START_INDEX + i * 13 + 7 + j] = TRUE;
+                    actions[USE_START_INDEX + i * 7 + 1 + j] = TRUE;
 
                 for (int j = 0; j < opponent->right_lane; j++)
-                    actions[USE_START_INDEX + i * 13 + 10 + j] = TRUE;
+                    actions[USE_START_INDEX + i * 7 + 4 + j] = TRUE;
 
                 break;
         }
@@ -205,8 +205,8 @@ Action decode_action(uint8 action) {
         action -= USE_START_INDEX;
 
         type = USE;
-        origin = action / 13;
-        target = (action % 13) - 1; // if zero, then NONE (-1)
+        origin = action / 7;
+        target = (action % 7) - 1; // if zero, then NONE (-1)
     } else if (action >= SUMMON_START_INDEX) {
         action -= SUMMON_START_INDEX;
 
