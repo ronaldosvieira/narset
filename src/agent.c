@@ -6,9 +6,8 @@
 #include "agent.h"
 #include "engine.h"
 
-State* state_from_native_input() {
+void state_from_native_input(State* state) {
     // initialize the state
-    State *state = malloc(sizeof(State));
     init_state(state);
 
     Player *pl = state->current_player;
@@ -52,39 +51,37 @@ State* state_from_native_input() {
     int card_count;
     scanf("%d", &card_count);
     for (int i = 0; i < card_count; i++) {
-        Card *card = malloc(sizeof(Card));
+        Card card = {};
         char abilities[7];
 
-        scanf("%d%d%hhd%hhd%hhd%hhd%hhd%s%hhd%hhd%hhd%hhd", &card->id,
-                &card->instance_id, &card->location, &card->type, &card->cost,
-                &card->attack, &card->defense, abilities, &card->player_hp,
-                &card->enemy_hp, &card->card_draw, &card->lane);
+        scanf("%d%d%hhd%hhd%hhd%hhd%hhd%s%hhd%hhd%hhd%hhd", &card.id,
+                &card.instance_id, &card.location, &card.type, &card.cost,
+                &card.attack, &card.defense, abilities, &card.player_hp,
+                &card.enemy_hp, &card.card_draw, &card.lane);
 
         for (int j = 0; j < 6; j++)
             if (abilities[j] != '-')
-                add_keyword(card, j);
+                add_keyword(&card, j);
 
         // add new card and increment appropriate counter
-        if (card->location == 0)
-            player_hand[state->current_player->hand_size++] = *card;
-        else if (card->location == 1) {
-            card->can_attack = TRUE;
+        if (card.location == 0)
+            player_hand[state->current_player->hand_size++] = card;
+        else if (card.location == 1) {
+            card.can_attack = TRUE;
 
-            if (card->lane == 0)
-                player_board[LEFT_LANE + state->current_player->left_lane_size++] = *card;
-            else if (card->lane == 1)
-                player_board[RIGHT_LANE + state->current_player->right_lane_size++] = *card;
-        } else if (card->location == -1) {
-            card->can_attack = TRUE;
+            if (card.lane == 0)
+                player_board[LEFT_LANE + state->current_player->left_lane_size++] = card;
+            else if (card.lane == 1)
+                player_board[RIGHT_LANE + state->current_player->right_lane_size++] = card;
+        } else if (card.location == -1) {
+            card.can_attack = TRUE;
 
-            if (card->lane == 0)
-                opp_board[LEFT_LANE + state->opposing_player->left_lane_size++] = *card;
-            else if (card->lane == 1)
-                opp_board[RIGHT_LANE + state->opposing_player->right_lane_size++] = *card;
+            if (card.lane == 0)
+                opp_board[LEFT_LANE + state->opposing_player->left_lane_size++] = card;
+            else if (card.lane == 1)
+                opp_board[RIGHT_LANE + state->opposing_player->right_lane_size++] = card;
         }
     }
-
-    return state;
 }
 
 void state_to_native_input(State* state) {
@@ -166,7 +163,9 @@ int main() {
 
     srand((time.tv_sec * 1000) + (time.tv_usec / 1000));
 
-    State *state = state_from_native_input();
+    State *state = malloc(sizeof(State));
+
+    state_from_native_input(state);
 
     state_to_native_input(state);
 
@@ -257,5 +256,7 @@ int main() {
     printf("\n");
 
     printf("%ld\n", sizeof(State));
+
+    free(state);
 }
 #pragma clang diagnostic pop

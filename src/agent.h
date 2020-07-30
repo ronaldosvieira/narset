@@ -3,6 +3,7 @@
 
 #include "engine.h"
 
-State* state_from_native_input();
+void state_from_native_input(State* state);
+void state_to_native_input(State* state);
 
 #endif //NARSET_AGENT_H
