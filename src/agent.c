@@ -15,6 +15,7 @@ State* state_from_native_input() {
     Player *en = state->opposing_player;
     Card *player_hand = &state->cards[pl->id == 0? P0_HAND : P1_HAND];
     Card *player_board = &state->cards[pl->id == 0? P0_BOARD : P1_BOARD];
+    Card *opp_hand = &state->cards[pl->id == 0? P1_HAND : P0_HAND];
     Card *opp_board = &state->cards[pl->id == 0? P1_BOARD : P0_BOARD];
 
     // read player info
@@ -29,12 +30,16 @@ State* state_from_native_input() {
     en->mana = en->base_mana;
 
     // read amount of cards in opponent's hand and past actions
-    int op_hand, op_actions;
-    scanf("%d%d", &op_hand, &op_actions); fgetc(stdin);
+    int op_actions;
+    scanf("%hhd%d", &en->hand_size, &op_actions); fgetc(stdin);
     for (int i = 0; i < op_actions; i++) {
         char card_number_and_action[21];
         fgets(card_number_and_action, 21, stdin);
     }
+
+    // add fake cards to opponent's hand
+    for (int i = 0; i < en->hand_size; i++)
+        opp_hand[i] = (Card) {.id = UNKNOWN, .instance_id = UNKNOWN, .cost = 1};
 
     // read cards
     int card_count;

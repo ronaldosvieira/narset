@@ -4,6 +4,7 @@
 #define FALSE 0
 #define TRUE 1
 #define NONE -1
+#define UNKNOWN -99
 
 typedef char Bool;
 
@@ -34,13 +35,10 @@ typedef unsigned char CardType;
 #define P0_BOARD 8
 #define P1_BOARD 14
 #define P1_HAND 20
-
-typedef char Location;
-
 #define LEFT_LANE 0
 #define RIGHT_LANE 3
 
-typedef unsigned char Lane;
+typedef char Location;
 
 #define BREAKTHROUGH 0
 #define CHARGE 1
