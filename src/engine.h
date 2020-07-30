@@ -76,7 +76,7 @@ typedef struct Player {
 #define ATTACK_START_INDEX 73
 
 typedef struct State {
-    uint8 turn;
+    uint8 round;
     Player *current_player, *opposing_player;
 
     Player players[2];

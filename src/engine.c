@@ -67,7 +67,7 @@ int8 damage_player(Player* player, int8 amount) {
 }
 
 void init_state(State* state) {
-    state->turn = 1;
+    state->round = 1;
 
     init_player(&state->players[0], 0);
     init_player(&state->players[1], 1);
@@ -347,7 +347,7 @@ void do_attack(State* state, int8 origin, int8 target) {
     if (has_keyword(*attacker, DRAIN))
         player->health += damage_dealt;
 
-    // prevent the creature from attacking again this turn
+    // prevent the creature from attacking again this round
     attacker->can_attack = FALSE;
 }
 
