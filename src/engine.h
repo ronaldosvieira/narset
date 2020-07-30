@@ -88,20 +88,20 @@ typedef struct State {
     int8 winner;
 } State;
 
-/* Card methods */
+/* Card functions */
 Bool has_keyword(Card card, Keyword keyword);
 void add_keyword(Card* card, Keyword keyword);
 void remove_keyword(Card* card, Keyword keyword);
 int8 damage_creature(Card* creature, int8 amount);
-Card* copy_card(Card *card);
 
-/* Player methods */
+/* Player functions */
 void init_player(Player* player, int id);
 int8 damage_player(Player* player, int8 amount);
 
-/* State methods */
+/* State functions */
 void init_state(State* state);
 void calculate_valid_actions(State* state);
 void act_on_state(State* state, uint8 action_index);
+State* copy_state(State* state);
 
 #endif //NARSET_ENGINE_H

@@ -8,6 +8,7 @@
 #include <string.h>
 #include <sys/time.h>
 
+/* Card functions */
 Bool has_keyword(Card card, Keyword keyword) {
     return (card.keywords >> keyword) & (unsigned char) 1;
 }
@@ -34,7 +35,7 @@ int8 damage_creature(Card* creature, int8 amount) {
     return amount;
 }
 
-/* Player methods */
+/* Player functions */
 void init_player(Player* player, int id) {
     player->id = id;
     player->health = 30;
@@ -58,6 +59,7 @@ int8 damage_player(Player* player, int8 amount) {
     return amount;
 }
 
+/* State functions */
 void init_state(State* state) {
     init_player(&state->players[0], 0);
     init_player(&state->players[1], 1);
