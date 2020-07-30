@@ -76,6 +76,11 @@ void init_state(State* state) {
     for (int i = 0; i < CARDS_IN_STATE; i++)
         state->cards[i].id = NONE;
 
+    for (int i = 0; i < CARDS_IN_DECK; i++) {
+        state->decks[0][i].id = NONE;
+        state->decks[1][i].id = NONE;
+    }
+
     state->valid_actions[0] = NONE;
 
     state->winner = -1;
@@ -396,9 +401,10 @@ void do_pass(State* state) {
             break;
 
         if (player->deck_size > 0) { // if there are still cards to draw, then do it
-            player_hand[player->hand_size++] =
-                    (Card) {.id = UNKNOWN, .instance_id = UNKNOWN, .cost = 1};
-            player->deck_size--;
+            Card *top_of_deck = &state->decks[player->id][--player->deck_size];
+            player_hand[player->hand_size++] = *top_of_deck;
+
+            top_of_deck->id = NONE;
         } else { // else, damage the player to the closest rune
             damage_player(player, player->health - player->next_rune);
         }

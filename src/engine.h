@@ -68,6 +68,7 @@ typedef struct Player {
 # define MAX_CARDS_LANE 3
 # define MAX_CARDS_BOARD 6
 # define CARDS_IN_STATE ((MAX_CARDS_HAND + MAX_CARDS_BOARD) * 2)
+# define CARDS_IN_DECK 30
 
 #define SUMMON_START_INDEX 1
 #define USE_START_INDEX 17
@@ -80,6 +81,7 @@ typedef struct State {
     Player players[2];
 
     Card cards[CARDS_IN_STATE];
+    Card decks[2][CARDS_IN_DECK];
 
     Bool valid_actions[97];
 
