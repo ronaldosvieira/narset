@@ -394,6 +394,12 @@ State* copy_state(State* state) {
 
     memcpy(copied_state, state, sizeof(State));
 
+    // update pointers
+    int current_player_id = state->current_player->id;
+
+    copied_state->current_player = &copied_state->players[current_player_id];
+    copied_state->opposing_player = &copied_state->players[(current_player_id + 1) % 2];
+
     return copied_state;
 }
 
