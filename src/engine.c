@@ -362,6 +362,7 @@ void do_pass(State* state) {
     // initialize shortcuts
     Player *player = state->current_player;
     Card *player_board = &state->cards[player->id == 0? P0_BOARD : P1_BOARD];
+    Card *player_hand = &state->cards[player->id == 0? P0_HAND : P1_HAND];
 
     // if it's first player's turn, then it's a new round
     if (player->id == 0) state->round++;
@@ -399,8 +400,8 @@ void do_pass(State* state) {
             break;
 
         if (player->deck > 0) { // if there are still cards to draw, then do it
-            // todo: implement actual drawing
-
+            player_hand[player->hand_size++] =
+                    (Card) {.id = UNKNOWN, .instance_id = UNKNOWN, .cost = 1};
             player->deck--;
         } else { // else, damage the player to the closest rune
             damage_player(player, player->health - player->next_rune);
