@@ -11,8 +11,11 @@ State* state_from_native_input() {
     State *state = malloc(sizeof(State));
     init_state(state);
 
-    Player *pl = &state->players[0];
-    Player *en = &state->players[1];
+    Player *pl = state->current_player;
+    Player *en = state->opposing_player;
+    Card *player_hand = &state->cards[pl->id == 0? P0_HAND : P1_HAND];
+    Card *player_board = &state->cards[pl->id == 0? P0_BOARD : P1_BOARD];
+    Card *opp_board = &state->cards[pl->id == 0? P1_BOARD : P0_BOARD];
 
     // read player info
     scanf("%hhd%hhd%hhd%hhd%*d", &pl->health, &pl->mana, &pl->deck,
@@ -47,28 +50,24 @@ State* state_from_native_input() {
             if (abilities[j] != '-')
                 add_keyword(card, j);
 
-        int position = -1;
-
-        // get position to add new card and increment appropriate counter
+        // add new card and increment appropriate counter
         if (card->location == 0)
-            position = P0_HAND + state->current_player->hand++;
+            player_hand[state->current_player->hand++] = *card;
         else if (card->location == 1) {
             card->can_attack = TRUE;
 
             if (card->lane == 0)
-                position = P0_BOARD + LEFT_LANE + state->current_player->left_lane++;
+                player_board[LEFT_LANE + state->current_player->left_lane++] = *card;
             else if (card->lane == 1)
-                position = P0_BOARD + RIGHT_LANE + state->current_player->right_lane++;
+                player_board[RIGHT_LANE + state->current_player->right_lane++] = *card;
         } else if (card->location == -1) {
             card->can_attack = TRUE;
 
             if (card->lane == 0)
-                position = P1_BOARD + LEFT_LANE + state->opposing_player->left_lane++;
+                opp_board[LEFT_LANE + state->opposing_player->left_lane++] = *card;
             else if (card->lane == 1)
-                position = P1_BOARD + RIGHT_LANE + state->opposing_player->right_lane++;
+                opp_board[RIGHT_LANE + state->opposing_player->right_lane++] = *card;
         }
-
-        state->cards[position] = *card;
     }
 
     return state;
