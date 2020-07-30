@@ -75,6 +75,79 @@ State* state_from_native_input() {
     return state;
 }
 
+void state_to_native_input(State* state) {
+    // initialize shortcuts
+    Player *pl = state->current_player;
+    Player *op = state->opposing_player;
+    Card *player_hand = &state->cards[pl->id == 0 ? P0_HAND : P1_HAND];
+    Card *player_board = &state->cards[pl->id == 0 ? P0_BOARD : P1_BOARD];
+    Card *opp_board = &state->cards[pl->id == 0 ? P1_BOARD : P0_BOARD];
+
+    // print players info
+    printf("%d %d %d %d %d\n", pl->health, pl->base_mana + pl->bonus_mana,
+           pl->deck, pl->next_rune, 1 + pl->bonus_draw);
+    printf("%d %d %d %d %d\n", op->health, op->base_mana + op->bonus_mana,
+           op->deck, op->next_rune, 1 + op->bonus_draw);
+
+    // print size of opponent hand and no previous actions
+    printf("%d 0\n", op->hand_size);
+
+    // print amount of cards
+    printf("%d\n", pl->hand_size + pl->left_lane_size + pl->right_lane_size +
+            op->hand_size + op->left_lane_size + op->right_lane_size);
+
+    // print cards in current player's hand
+    for (int i = 0; i < pl->hand_size; i++) {
+        Card *card = &player_hand[i];
+
+        char abilities[7] = "BCDGLW\0";
+
+        for (int j = 0; j < 6; j++)
+            if (!has_keyword(*card, j))
+                abilities[j] = '-';
+
+        printf("%d %d 0 %d %d %d %d %s %d %d %d -1 \n", card->id, card->instance_id,
+               card->type, card->cost, card->attack, card->defense, abilities,
+               card->player_hp, card->enemy_hp, card->card_draw);
+    }
+
+    // print cards in current player's board
+    for (int i = 0; i < 6; i++) {
+        Card *card = &player_board[i];
+
+        if (card->id == NONE)
+            continue;
+
+        char abilities[7] = "BCDGLW\0";
+
+        for (int j = 0; j < 6; j++)
+            if (!has_keyword(*card, j))
+                abilities[j] = '-';
+
+        printf("%d %d 1 %d %d %d %d %s %d %d %d %d \n", card->id, card->instance_id,
+               card->type, card->cost, card->attack, card->defense, abilities,
+               card->player_hp, card->enemy_hp, card->card_draw, card->lane);
+    }
+
+    // print cards in opposing player's board
+    for (int i = 0; i < 6; i++) {
+        Card *card = &opp_board[i];
+
+        if (card->id == NONE)
+            continue;
+
+        char abilities[7] = "BCDGLW\0";
+
+        for (int j = 0; j < 6; j++)
+            if (!has_keyword(*card, j))
+                abilities[j] = '-';
+
+        printf("%d %d -1 %d %d %d %d %s %d %d %d %d \n", card->id, card->instance_id,
+               card->type, card->cost, card->attack, card->defense, abilities,
+               card->player_hp, card->enemy_hp, card->card_draw, card->lane);
+    }
+}
+
 int main() {
     struct timeval time;
     gettimeofday(&time, NULL);
