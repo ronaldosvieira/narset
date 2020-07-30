@@ -340,6 +340,9 @@ int remove_dead_creatures(Card lane[], int board_size) {
     int last_alive_creature = -1;
 
     for (int i = 0; i < board_size; i++) {
+        if (lane[i].id == NONE)
+            continue;
+
         if (lane[i].defense <= 0) {
             lane[i].id = NONE;
             dead_creatures++;
