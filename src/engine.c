@@ -67,8 +67,6 @@ int8 damage_player(Player* player, int8 amount) {
 }
 
 void init_state(State* state) {
-    state->round = 1;
-
     init_player(&state->players[0], 0);
     init_player(&state->players[1], 1);
 
@@ -76,13 +74,11 @@ void init_state(State* state) {
     state->opposing_player = &state->players[1];
 
     for (int i = 0; i < CARDS_IN_STATE; i++)
-        state->cards[i].id = -1;
+        state->cards[i].id = NONE;
 
     state->valid_actions[0] = NONE;
 
     state->winner = -1;
-
-    state->players[1].bonus_draw = 1;
 }
 
 void calculate_valid_actions(State* state) {
