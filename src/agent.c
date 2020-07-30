@@ -156,19 +156,7 @@ int main() {
 
     State *state = state_from_native_input();
 
-    Player *p = state->current_player;
-    Player *op = state->opposing_player;
-
-    printf("%d %d\n", state->round, state->current_player->id);
-    printf("%d %d %d %d %d\n", p->hand_size, p->left_lane_size,
-           p->right_lane_size, op->left_lane_size, op->right_lane_size);
-    printf("%d %d %d %d %d\n", p->health, p->mana, p->deck,
-            p->next_rune, p->bonus_draw);
-    printf("%d %d %d %d %d\n", op->health, op->mana, op->deck,
-            op->next_rune, op->bonus_draw);
-    printf("%d %d %d\n", has_keyword(state->cards[1], GUARD),
-            has_keyword(state->cards[1], CHARGE), state->cards[1].id);
-    printf("%d\n", state->winner);
+    state_to_native_input(state);
 
     calculate_valid_actions(state);
 
@@ -177,7 +165,76 @@ int main() {
     }
     printf("\n");
 
-    for (int i = USE_START_INDEX; i < USE_START_INDEX + 104; ++i) {
+    for (int i = USE_START_INDEX; i < USE_START_INDEX + 56; ++i) {
+        printf("%d ", state->valid_actions[i]);
+    }
+    printf("\n");
+
+    for (int i = ATTACK_START_INDEX; i < ATTACK_START_INDEX + 24; ++i) {
+        printf("%d ", state->valid_actions[i]);
+    }
+    printf("\n");
+
+    printf("%ld\n", sizeof(State));
+
+    act_on_state(state, 1);
+
+    state_to_native_input(state);
+
+    calculate_valid_actions(state);
+
+    for (int i = SUMMON_START_INDEX; i < SUMMON_START_INDEX + 16; ++i) {
+        printf("%d ", state->valid_actions[i]);
+    }
+    printf("\n");
+
+    for (int i = USE_START_INDEX; i < USE_START_INDEX + 56; ++i) {
+        printf("%d ", state->valid_actions[i]);
+    }
+    printf("\n");
+
+    for (int i = ATTACK_START_INDEX; i < ATTACK_START_INDEX + 24; ++i) {
+        printf("%d ", state->valid_actions[i]);
+    }
+    printf("\n");
+
+    printf("%ld\n", sizeof(State));
+
+    act_on_state(state, 73);
+
+    state_to_native_input(state);
+
+    calculate_valid_actions(state);
+
+    for (int i = SUMMON_START_INDEX; i < SUMMON_START_INDEX + 16; ++i) {
+        printf("%d ", state->valid_actions[i]);
+    }
+    printf("\n");
+
+    for (int i = USE_START_INDEX; i < USE_START_INDEX + 56; ++i) {
+        printf("%d ", state->valid_actions[i]);
+    }
+    printf("\n");
+
+    for (int i = ATTACK_START_INDEX; i < ATTACK_START_INDEX + 24; ++i) {
+        printf("%d ", state->valid_actions[i]);
+    }
+    printf("\n");
+
+    printf("%ld\n", sizeof(State));
+
+    act_on_state(state, 0);
+
+    state_to_native_input(state);
+
+    calculate_valid_actions(state);
+
+    for (int i = SUMMON_START_INDEX; i < SUMMON_START_INDEX + 16; ++i) {
+        printf("%d ", state->valid_actions[i]);
+    }
+    printf("\n");
+
+    for (int i = USE_START_INDEX; i < USE_START_INDEX + 56; ++i) {
         printf("%d ", state->valid_actions[i]);
     }
     printf("\n");
