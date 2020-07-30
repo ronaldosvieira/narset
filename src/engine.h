@@ -69,7 +69,7 @@ typedef struct Player {
 # define MAX_CARDS_HAND 8
 # define MAX_CARDS_SINGLE_LANE 3
 # define MAX_CARDS_LANES 6
-# define CARDS_IN_STATE (MAX_CARDS_HAND * 2 + MAX_CARDS_LANES * 4)
+# define CARDS_IN_STATE ((MAX_CARDS_HAND + MAX_CARDS_LANES) * 2)
 
 #define SUMMON_START_INDEX 1
 #define USE_START_INDEX 17
