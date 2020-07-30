@@ -54,9 +54,9 @@ typedef unsigned char Keyword;
 typedef struct Card {
     int id, instance_id;
     CardType type;
-    int8 cost, attack, defense, player_hp, enemy_hp, card_draw;
+    int8 cost, attack, defense, player_hp, enemy_hp, card_draw, lane;
     unsigned char keywords;
-    Location location; Lane lane;
+    Location location;
     Bool can_attack;
 } Card;
 

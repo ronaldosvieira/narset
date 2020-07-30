@@ -243,6 +243,9 @@ void do_summon(State* state, int8 origin, int8 lane) {
     if (has_keyword(creature, CHARGE))
         creature.can_attack = TRUE;
 
+    // set the creature's lane
+    creature.lane = lane;
+
     // add creature to board
     if (lane == 0)
         player_board[LEFT_LANE + player->left_lane_size++] = creature;
