@@ -25,7 +25,7 @@ Node* select_with_uct(Node* node, double exploration_weight) {
         }
 
         if (exploration_weight == 0)
-            printf("stats %d -> %d: %d / %d = %.3f (height %d)\n",
+            debug_print("stats %d -> %d: %d / %d = %.3f (height %d)\n",
                    node->action, child->action,
                    child->rewards, child->visits, score, child->height);
 
@@ -149,7 +149,7 @@ void choose_best(Node* root, int8* actions) {
     }
 
     if (node != NULL)
-        printf("stats: %d / %d \n", node->rewards, node->visits);
+        debug_print("stats: %d / %d \n", node->rewards, node->visits);
 
     actions[i] = 0;
 }

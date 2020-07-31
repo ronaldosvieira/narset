@@ -5,6 +5,11 @@
 #include <math.h>
 #include "engine.h"
 
+#define DEBUG 0
+
+#define debug_print(fmt, ...) \
+            do { if (DEBUG) fprintf(stderr, fmt, __VA_ARGS__); } while (0)
+
 #define EXPLORATION_WEIGHT 0.5
 #define MAX_ACTIONS 15
 
