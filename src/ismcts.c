@@ -22,7 +22,7 @@ double uct_score(Node* node, double exploration_weight) {
     float log_parent_visits = parent_visits < LOGS_TO_PRECOMPUTE ?
                               logs[parent_visits] : logf((float) parent_visits);
 
-    float exploration = sqrtf(log_10_parent_visits / (float) node->visits);
+    float exploration = sqrtf(log_parent_visits / (float) node->visits);
 
     return exploitation + exploration_weight * exploration;
 }
