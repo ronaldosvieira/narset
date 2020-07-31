@@ -60,7 +60,11 @@ int8 damage_player(Player* player, int8 amount) {
 }
 
 /* State functions */
-void init_state(State* state) {
+State* new_state() {
+    State* state = malloc(sizeof(State));
+
+    state->round = 0;
+
     init_player(&state->players[0], 0);
     init_player(&state->players[1], 1);
 
@@ -78,6 +82,8 @@ void init_state(State* state) {
     state->valid_actions[0] = NONE;
 
     state->winner = -1;
+
+    return state;
 }
 
 int8 calculate_valid_actions(State* state) {

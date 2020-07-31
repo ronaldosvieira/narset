@@ -7,9 +7,6 @@
 #include "engine.h"
 
 void state_from_native_input(State* state) {
-    // initialize the state
-    init_state(state);
-
     Player *pl = state->current_player;
     Player *en = state->opposing_player;
     Card *player_hand = &state->cards[pl->id == 0? P0_HAND : P1_HAND];
@@ -163,8 +160,8 @@ int main() {
 
     srand((time.tv_sec * 1000) + (time.tv_usec / 1000));
 
-    State *state = malloc(sizeof(State));
-
+    // initialize state
+    State *state = new_state();
     state_from_native_input(state);
 
     state_to_native_input(state);
