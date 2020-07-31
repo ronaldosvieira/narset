@@ -4,8 +4,8 @@
 #include "ismcts.h"
 
 double uct_score(Node* node, double exploration_weight) {
-    double exploitation = (float) node->rewards / (float) node->visits;
-    double exploration = sqrt(log10(node->visits) / node->visits);
+    float exploitation = (float) node->rewards / (float) node->visits;
+    float exploration = sqrt(log10f(node->visits) / node->visits);
 
     return exploitation + exploration_weight * exploration;
 }
