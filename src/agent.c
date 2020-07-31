@@ -35,14 +35,17 @@ void state_from_native_input(State* state) {
 
     // populate opponent's hand with fake cards
     for (int i = 0; i < en->hand_size; i++)
-        opp_hand[i] = (Card) {.id = UNKNOWN, .instance_id = UNKNOWN, .cost = 1};
+        opp_hand[i] = (Card) {.id = UNKNOWN, .instance_id = UNKNOWN, .cost = 1,
+                              .attack = 1, .defense = 1};
 
     // populate decks with fake cards
     for (int i = 0; i < pl->deck_size; i++)
-        state->decks[pl->id][i] = (Card) {.id = UNKNOWN, .instance_id = UNKNOWN, .cost = 1};
+        state->decks[pl->id][i] = (Card) {.id = UNKNOWN, .instance_id = UNKNOWN,
+                                          .cost = 1, .attack = 1, .defense = 1};
 
     for (int i = 0; i < en->deck_size; i++)
-        state->decks[en->id][i] = (Card) {.id = UNKNOWN, .instance_id = UNKNOWN, .cost = 1};
+        state->decks[en->id][i] = (Card) {.id = UNKNOWN, .instance_id = UNKNOWN,
+                                          .cost = 1, .attack = 1, .defense = 1};
 
     // read cards
     int card_count;
