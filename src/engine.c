@@ -159,13 +159,17 @@ int8 calculate_valid_actions(State* state) {
 
     // check if there are guards in the left lane
     for (int j = 0; j < opponent->left_lane_size; j++)
-        if (has_keyword(opp_board[LEFT_LANE + j], GUARD))
+        if (has_keyword(opp_board[LEFT_LANE + j], GUARD)) {
             has_guard_in_left_lane = TRUE;
+            break;
+        }
 
     // check if there are guards in the right lane
     for (int j = 0; j < opponent->right_lane_size; j++)
-        if (has_keyword(opp_board[RIGHT_LANE + j], GUARD))
+        if (has_keyword(opp_board[RIGHT_LANE + j], GUARD)) {
             has_guard_in_right_lane = TRUE;
+            break;
+        }
 
     // check attacks available for each creature in the left lane
     for (int i = 0; i < player->left_lane_size; i++) {
