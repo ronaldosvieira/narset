@@ -104,4 +104,7 @@ int8 calculate_valid_actions(State* state);
 void act_on_state(State* state, uint8 action_index);
 State* copy_state(State* state);
 
+/* Util functions */
+Action decode_action(uint8 action);
+
 #endif //NARSET_ENGINE_H

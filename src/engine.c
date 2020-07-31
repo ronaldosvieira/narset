@@ -208,34 +208,6 @@ int8 calculate_valid_actions(State* state) {
     return amount;
 }
 
-Action decode_action(uint8 action) {
-    ActionType type = PASS;
-    int8 origin = NONE;
-    int8 target = NONE;
-
-    if (action >= ATTACK_START_INDEX) {
-        action -= ATTACK_START_INDEX;
-
-        type = ATTACK;
-        origin = action / 4;
-        target = (action % 4) - 1; // if zero, then NONE (-1)
-    } else if (action >= USE_START_INDEX) {
-        action -= USE_START_INDEX;
-
-        type = USE;
-        origin = action / 7;
-        target = (action % 7) - 1; // if zero, then NONE (-1)
-    } else if (action >= SUMMON_START_INDEX) {
-        action -= SUMMON_START_INDEX;
-
-        type = SUMMON;
-        origin = action / 2;
-        target = action % 2;
-    }
-
-    return (Action) {.type = type, .origin = origin, .target = target};
-}
-
 void do_summon(State* state, int8 origin, int8 lane) {
     // initialize shortcut
     Player *player = state->current_player;
@@ -506,6 +478,35 @@ State* copy_state(State* state) {
     copied_state->opposing_player = &copied_state->players[(current_player_id + 1) % 2];
 
     return copied_state;
+}
+
+/* Util actions */
+Action decode_action(uint8 action) {
+    ActionType type = PASS;
+    int8 origin = NONE;
+    int8 target = NONE;
+
+    if (action >= ATTACK_START_INDEX) {
+        action -= ATTACK_START_INDEX;
+
+        type = ATTACK;
+        origin = action / 4;
+        target = (action % 4) - 1; // if zero, then NONE (-1)
+    } else if (action >= USE_START_INDEX) {
+        action -= USE_START_INDEX;
+
+        type = USE;
+        origin = action / 7;
+        target = (action % 7) - 1; // if zero, then NONE (-1)
+    } else if (action >= SUMMON_START_INDEX) {
+        action -= SUMMON_START_INDEX;
+
+        type = SUMMON;
+        origin = action / 2;
+        target = action % 2;
+    }
+
+    return (Action) {.type = type, .origin = origin, .target = target};
 }
 
 #pragma clang diagnostic pop

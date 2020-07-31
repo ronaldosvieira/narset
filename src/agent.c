@@ -158,6 +158,57 @@ void state_to_native_input(State* state) {
     }
 }
 
+char* action_index_to_native_action(State* state, uint8 action_index) {
+    // initialize shortcut
+    Player *player = state->current_player;
+    Card *player_hand = &state->cards[player->id == 0? P0_HAND : P1_HAND];
+    Card *player_board = &state->cards[player->id == 0? P0_BOARD : P1_BOARD];
+    Card *opp_board = &state->cards[player->id == 0? P1_BOARD : P0_BOARD];
+
+    Action action = decode_action(action_index);
+
+    char *type;
+    int8 origin, target;
+    switch (action.type) {
+        case PASS: return "PASS";
+        case SUMMON:
+            type = "SUMMON";
+            origin = player_hand[action.origin].instance_id;
+            target = action.target;
+            break;
+        case USE:
+            type = "USE";
+            origin = player_hand[action.origin].instance_id;
+
+            if (action.target == NONE) target = action.target;
+            else {
+                switch (player_hand[action.origin].type) {
+                    case GREEN_ITEM:
+                        target = player_board[action.target].instance_id;
+                        break;
+                    case RED_ITEM:
+                    case BLUE_ITEM:
+                        target = opp_board[action.target].instance_id;
+                        break;
+                }
+            }
+            break;
+        case ATTACK:
+            type = "ATTACK";
+            origin = player_board[action.target].instance_id;
+
+            if (action.target == NONE) target = action.target;
+            else target = opp_board[action.target].instance_id;
+
+            break;
+    }
+
+    char* native_action = malloc(25 * sizeof(char));
+    snprintf(native_action, 25, "%s %d %d", type, origin, target);
+
+    return native_action;
+}
+
 int main() {
     struct timeval time;
     gettimeofday(&time, NULL);
@@ -198,8 +249,10 @@ int main() {
 
     printf("Chosen actions: ");
 
-    for (int i = 0; i < MAX_ACTIONS && actions[i] != 0; i++)
-        printf("%d ", actions[i]);
+    for (int i = 0; i < MAX_ACTIONS && actions[i] != 0; i++) {
+        printf("%s; ", action_index_to_native_action(state, actions[i]));
+        act_on_state(state, actions[i]);
+    }
 
     printf("\n");
 
