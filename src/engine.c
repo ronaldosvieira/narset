@@ -472,14 +472,16 @@ void act_on_state(State* state, uint8 action_index) {
     state->valid_actions[0] = NONE;
 
     // remove any dead creatures
-    player->left_lane_size -= remove_dead_creatures(
-            &player_board[LEFT_LANE], MAX_CARDS_LANE);
-    player->right_lane_size -= remove_dead_creatures(
-            &player_board[RIGHT_LANE], MAX_CARDS_LANE);
-    opponent->left_lane_size -= remove_dead_creatures(
-            &opp_board[LEFT_LANE], MAX_CARDS_LANE);
-    opponent->right_lane_size -= remove_dead_creatures(
-            &opp_board[RIGHT_LANE], MAX_CARDS_LANE);
+    if (action.type == USE || (action.type == ATTACK && action.target != NONE)) {
+        player->left_lane_size -= remove_dead_creatures(
+                &player_board[LEFT_LANE], MAX_CARDS_LANE);
+        player->right_lane_size -= remove_dead_creatures(
+                &player_board[RIGHT_LANE], MAX_CARDS_LANE);
+        opponent->left_lane_size -= remove_dead_creatures(
+                &opp_board[LEFT_LANE], MAX_CARDS_LANE);
+        opponent->right_lane_size -= remove_dead_creatures(
+                &opp_board[RIGHT_LANE], MAX_CARDS_LANE);
+    }
 
     // declare a winner, if there's any
     if (state->players[0].health <= 0)
