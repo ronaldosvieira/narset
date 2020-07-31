@@ -196,8 +196,9 @@ int8* act(State* state) {
         if (i % 100 == 0) {
             double time_elapsed = (double) (clock() - start_time) / CLOCKS_PER_SEC;
 
-            if (time_elapsed > 0.15) {
-                printf("rollouts: %d\n", i);
+            if (time_elapsed > 0.150) {
+                debug_print("rollouts: %d\n", i);
+                debug_print("time spent searching: %.3f\n", time_elapsed);
                 break;
             }
         }
