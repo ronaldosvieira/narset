@@ -250,8 +250,11 @@ int main() {
     printf("Chosen actions: ");
 
     for (int i = 0; i < MAX_ACTIONS && actions[i] != 0; i++) {
-        printf("%s; ", action_index_to_native_action(state, actions[i]));
+        char *native_action = action_index_to_native_action(state, actions[i]);
+        printf("%s; ", native_action);
         act_on_state(state, actions[i]);
+
+        free(native_action);
     }
 
     printf("\n");
