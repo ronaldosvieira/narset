@@ -13,10 +13,11 @@ void precompute_log10s() {
 double uct_score(Node* node, double exploration_weight) {
     float exploitation = (float) node->rewards / (float) node->visits;
 
-    float log_10_visits = node->visits < LOG10_TO_PRECOMPUTE?
-            log10s[node->visits] : log10f((float) node->visits);
+    int parent_visits = node->parent != NULL? node->parent->visits : 0;
+    float log_10_parent_visits = parent_visits < LOG10_TO_PRECOMPUTE?
+            log10s[parent_visits] : log10f((float) parent_visits);
 
-    float exploration = sqrtf(log_10_visits / (float) node->visits);
+    float exploration = sqrtf(log_10_parent_visits / (float) node->visits);
 
     return exploitation + exploration_weight * exploration;
 }
