@@ -170,20 +170,25 @@ int main() {
     state_from_native_input(state);
     calculate_valid_actions(state);
 
+    printf("Received state:\n");
     state_to_native_input(state);
 
-    printf("%d\n", state->valid_actions[0]);
+    printf("\nValid actions:\n");
+    printf("PASS: %d\n", state->valid_actions[0]);
 
+    printf("SUMMON: ");
     for (int i = SUMMON_START_INDEX; i < SUMMON_START_INDEX + 16; ++i) {
         printf("%d ", state->valid_actions[i]);
     }
     printf("\n");
 
+    printf("USE: ");
     for (int i = USE_START_INDEX; i < USE_START_INDEX + 56; ++i) {
         printf("%d ", state->valid_actions[i]);
     }
     printf("\n");
 
+    printf("ATTACK: ");
     for (int i = ATTACK_START_INDEX; i < ATTACK_START_INDEX + 24; ++i) {
         printf("%d ", state->valid_actions[i]);
     }
@@ -191,7 +196,7 @@ int main() {
 
     int8 *actions = act(state);
 
-    printf("Actions: ");
+    printf("Chosen actions: ");
 
     for (int i = 0; i < MAX_ACTIONS && actions[i] != 0; i++)
         printf("%d ", actions[i]);
