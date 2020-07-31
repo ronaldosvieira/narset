@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include "ismcts.h"
 
 void precompute_log10s() {
@@ -167,6 +168,8 @@ void choose_best(Node* root, int8* actions) {
 }
 
 int8* act(State* state) {
+    clock_t start_time = clock();
+
     if (log10s[0] != 1) precompute_log10s();
 
     int8 valid_actions = calculate_valid_actions(state);
@@ -177,7 +180,7 @@ int8* act(State* state) {
                  .unvisited_children = valid_actions,
                  .height = 0};
 
-    for (int i = 0; i < 15000; i++) {
+    for (int i = 1; TRUE; i++) {
         State *state_copy = copy_state(state);
 
         // todo: determinize the state
@@ -185,6 +188,9 @@ int8* act(State* state) {
         do_rollout(&root, state_copy);
 
         free(state_copy);
+
+        double time_elapsed = (double) (clock() - start_time) / CLOCKS_PER_SEC;
+        if (time_elapsed > 0.15) {printf("rollouts: %d\n", i); break;}
     }
 
     int8 *actions = calloc(0, MAX_ACTIONS * sizeof(int8));
