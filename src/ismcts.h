@@ -12,6 +12,9 @@
 
 #define EXPLORATION_WEIGHT 0.5
 #define MAX_ACTIONS 15
+#define LOG10_TO_PRECOMPUTE 500
+
+float log10s[LOG10_TO_PRECOMPUTE];
 
 typedef struct Node {
     int8 action;

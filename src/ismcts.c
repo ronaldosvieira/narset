@@ -3,9 +3,20 @@
 #include <stdio.h>
 #include "ismcts.h"
 
+void precompute_log10s() {
+    log10s[0] = 1;
+
+    for (int i = 1; i < LOG10_TO_PRECOMPUTE; i++)
+        log10s[i] = log10f((float) i);
+}
+
 double uct_score(Node* node, double exploration_weight) {
     float exploitation = (float) node->rewards / (float) node->visits;
-    float exploration = sqrt(log10f(node->visits) / node->visits);
+
+    float log_10_visits = node->visits < LOG10_TO_PRECOMPUTE?
+            log10s[node->visits] : log10f((float) node->visits);
+
+    float exploration = sqrtf(log_10_visits / (float) node->visits);
 
     return exploitation + exploration_weight * exploration;
 }
@@ -155,6 +166,8 @@ void choose_best(Node* root, int8* actions) {
 }
 
 int8* act(State* state) {
+    if (log10s[0] != 1) precompute_log10s();
+
     int8 valid_actions = calculate_valid_actions(state);
 
     Node root = {.action = -1,
