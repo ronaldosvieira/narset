@@ -4,11 +4,15 @@
 #include <time.h>
 #include "ismcts.h"
 
+int LOGS_ARE_PRECOMPUTED = FALSE;
+
 void precompute_log10s() {
-    log10s[0] = 1;
+    log10s[0] = 0;
 
     for (int i = 1; i < LOG10_TO_PRECOMPUTE; i++)
         log10s[i] = log10f((float) i);
+
+    LOGS_ARE_PRECOMPUTED = TRUE;
 }
 
 double uct_score(Node* node, double exploration_weight) {
@@ -170,7 +174,7 @@ void choose_best(Node* root, int8* actions) {
 int8* act(State* state) {
     clock_t start_time = clock();
 
-    if (log10s[0] != 1) precompute_log10s();
+    if (LOGS_ARE_PRECOMPUTED == FALSE) precompute_log10s();
 
     int8 valid_actions = calculate_valid_actions(state);
 
