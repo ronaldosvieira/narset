@@ -193,8 +193,14 @@ int8* act(State* state) {
 
         free(state_copy);
 
-        double time_elapsed = (double) (clock() - start_time) / CLOCKS_PER_SEC;
-        if (time_elapsed > 0.15) {printf("rollouts: %d\n", i); break;}
+        if (i % 100 == 0) {
+            double time_elapsed = (double) (clock() - start_time) / CLOCKS_PER_SEC;
+
+            if (time_elapsed > 0.15) {
+                printf("rollouts: %d\n", i);
+                break;
+            }
+        }
     }
 
     int8 *actions = calloc(0, MAX_ACTIONS * sizeof(int8));
