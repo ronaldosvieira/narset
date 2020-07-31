@@ -6,11 +6,11 @@
 
 int LOGS_ARE_PRECOMPUTED = FALSE;
 
-void precompute_log10s() {
-    log10s[0] = 0;
+void precompute_logs() {
+    logs[0] = 0;
 
-    for (int i = 1; i < LOG10_TO_PRECOMPUTE; i++)
-        log10s[i] = log10f((float) i);
+    for (int i = 1; i < LOGS_TO_PRECOMPUTE; i++)
+        logs[i] = logf((float) i);
 
     LOGS_ARE_PRECOMPUTED = TRUE;
 }
@@ -19,8 +19,8 @@ double uct_score(Node* node, double exploration_weight) {
     float exploitation = (float) node->rewards / (float) node->visits;
 
     int parent_visits = node->parent != NULL? node->parent->visits : 0;
-    float log_10_parent_visits = parent_visits < LOG10_TO_PRECOMPUTE?
-            log10s[parent_visits] : log10f((float) parent_visits);
+    float log_parent_visits = parent_visits < LOGS_TO_PRECOMPUTE ?
+                              logs[parent_visits] : logf((float) parent_visits);
 
     float exploration = sqrtf(log_10_parent_visits / (float) node->visits);
 
@@ -174,7 +174,7 @@ void choose_best(Node* root, int8* actions) {
 int8* act(State* state) {
     clock_t start_time = clock();
 
-    if (LOGS_ARE_PRECOMPUTED == FALSE) precompute_log10s();
+    if (LOGS_ARE_PRECOMPUTED == FALSE) precompute_logs();
 
     int8 valid_actions = calculate_valid_actions(state);
 
