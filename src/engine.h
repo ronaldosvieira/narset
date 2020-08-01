@@ -45,7 +45,7 @@ typedef int Location;
 #define LETHAL 4
 #define WARD 5
 
-typedef int Keyword;
+typedef unsigned char Keyword;
 
 typedef struct Card {
     int id, instance_id;
