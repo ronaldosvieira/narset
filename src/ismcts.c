@@ -108,7 +108,7 @@ int simulate(State* state) {
     while (state->winner == NONE) {
         // chose a random action
         int valid_actions = calculate_valid_actions(state);
-        int ith_action = random() % valid_actions;
+        int ith_action = (int) random() % valid_actions;
 
         // find the i-th action
         int action = 0; int counter = 0;
@@ -192,7 +192,7 @@ void choose_best(Node* root, int* actions) {
 
     if (node != NULL)
         debug_print("chosen node: %.3f (height %d)\n",
-                    node->rewards / node->visits, node->height);
+                    (float) node->rewards / node->visits, node->height);
 
     actions[i] = 0;
 }
