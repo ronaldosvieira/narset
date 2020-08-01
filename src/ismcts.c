@@ -86,6 +86,7 @@ Node* expand(Node* node, int action) {
     new_leaf->height = node->height + 1;
     new_leaf->right_sibling = node->left_child;
     node->left_child = new_leaf;
+    new_leaf->left_child = NULL;
 
     if (action != 0)
         new_leaf->current_player = node->current_player;
@@ -93,6 +94,9 @@ Node* expand(Node* node, int action) {
         new_leaf->current_player = (node->current_player + 1) % 2;
 
     new_leaf->action = action;
+
+    new_leaf->rewards = 0;
+    new_leaf->visits = 0;
 
     return new_leaf;
 }
@@ -201,9 +205,14 @@ int* act(State* state) {
     Node *root = get_next_node();
     root->action = -1;
     root->current_player = state->current_player->id;
+    root->rewards = 0;
+    root->visits = 0;
+    root->height = 0;
     root->children = valid_actions;
     root->unvisited_children = valid_actions;
-    root->height = 0;
+    root->parent = NULL;
+    root->left_child = NULL;
+    root->right_sibling = NULL;
 
     if (state_copy == NULL)
         state_copy = malloc(sizeof(State));
