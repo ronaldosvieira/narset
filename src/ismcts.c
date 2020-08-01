@@ -191,15 +191,14 @@ void choose_best(Node* root, int* actions) {
     }
 
     if (node != NULL)
-        debug_print("stats: %d / %d \n", node->rewards, node->visits);
+        debug_print("chosen node: %.3f (height %d)\n",
+                    node->rewards / node->visits, node->height);
 
-    actions[i] = (int) 0;
+    actions[i] = 0;
 }
 
 int* act(State* state) {
     clock_t start_time = clock();
-
-    next_node = 0;
 
     int valid_actions = calculate_valid_actions(state);
 
@@ -239,10 +238,7 @@ int* act(State* state) {
     int *actions = malloc(MAX_ACTIONS * sizeof(int));
 
     choose_best(root, actions);
-
-    NODES_ARE_PREALLOCATED = FALSE;
-    free(preallocated_nodes);
-    amount_of_nodes = 0;
+    next_node = 0;
 
     return actions;
 }
