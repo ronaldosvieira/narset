@@ -79,7 +79,7 @@ Node* select_node(Node* root, State* state) {
     return node;
 }
 
-Node* expand(Node* node, int8 action) {
+Node* expand(Node* node, int action) {
     Node* new_leaf = get_next_node();
 
     new_leaf->parent = node;
@@ -100,8 +100,8 @@ Node* expand(Node* node, int8 action) {
 int simulate(State* state) {
     while (state->winner == NONE) {
         // chose a random action
-        int8 valid_actions = calculate_valid_actions(state);
-        int8 ith_action = random() % valid_actions;
+        int valid_actions = calculate_valid_actions(state);
+        int ith_action = random() % valid_actions;
 
         // find the i-th action
         int action = 0; int counter = 0;
@@ -133,42 +133,45 @@ void backpropagate(Node* node, int reward, int current_player) {
 
 void do_rollout(Node* root, State* state) {
     // select a leaf and forwards the state accordingly
-    Node* leaf = select_node(root, state);
+    Node* node = select_node(root, state);
+    Node* leaf = NULL;
 
     // if the leaf is not terminal, expand
-    if (leaf->children > 0) {
+    if (node->children > 0) {
         // find the i-th action
         calculate_valid_actions(state);
         int action = 0;
 
-        if (leaf->unvisited_children-- > 1) {
+        if (node->unvisited_children-- > 1) {
             int counter = 0;
-            while (counter != leaf->children - leaf->unvisited_children)
+            while (counter != node->children - node->unvisited_children)
                 if (state->valid_actions[++action] == TRUE)
                     counter++;
         }
 
         // expand the leaf, creating a new leaf
-        leaf = expand(leaf, action);
+        leaf = expand(node, action);
 
         // apply the action
         act_on_state(state, action);
 
-        int8 valid_actions = calculate_valid_actions(state);
+        int valid_actions = calculate_valid_actions(state);
 
         leaf->children = valid_actions;
         leaf->unvisited_children = valid_actions;
+    } else {
+        leaf = node;
     }
 
     // simulate the remainder of the match and get the result
-    int8 winner = simulate(state);
-    int8 reward = winner == root->current_player? 1 : 0;
+    int winner = simulate(state);
+    int reward = winner == root->current_player? 1 : 0;
 
     // backpropagate the simulation result upwards in the tree
     backpropagate(leaf, reward, root->current_player);
 }
 
-void choose_best(Node* root, int8* actions) {
+void choose_best(Node* root, int* actions) {
     Node* node = root;
     int i = 0;
 
@@ -183,17 +186,17 @@ void choose_best(Node* root, int8* actions) {
     if (node != NULL)
         debug_print("stats: %d / %d \n", node->rewards, node->visits);
 
-    actions[i] = 0;
+    actions[i] = (int) 0;
 }
 
-int8* act(State* state) {
+int* act(State* state) {
     clock_t start_time = clock();
 
     if (LOGS_ARE_PRECOMPUTED == FALSE) precompute_logs();
 
     next_node = 0;
 
-    int8 valid_actions = calculate_valid_actions(state);
+    int valid_actions = calculate_valid_actions(state);
 
     Node *root = get_next_node();
     root->action = -1;
@@ -223,7 +226,7 @@ int8* act(State* state) {
         }
     }
 
-    int8 *actions = calloc(0, MAX_ACTIONS * sizeof(int8));
+    int *actions = malloc(MAX_ACTIONS * sizeof(int));
 
     choose_best(root, actions);
 

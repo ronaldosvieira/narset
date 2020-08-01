@@ -6,7 +6,7 @@
 #define NONE -1
 #define UNKNOWN -99
 
-typedef char Bool;
+typedef int Bool;
 
 #define PASS 0
 #define PICK 1
@@ -14,13 +14,11 @@ typedef char Bool;
 #define USE 3
 #define ATTACK 4
 
-typedef unsigned char ActionType;
-typedef char int8;
-typedef unsigned char uint8;
+typedef int ActionType;
 
 typedef struct Action {
     ActionType type;
-    int8 origin, target;
+    int origin, target;
 } Action;
 
 #define CREATURE 0
@@ -28,7 +26,7 @@ typedef struct Action {
 #define RED_ITEM 2
 #define BLUE_ITEM 3
 
-typedef unsigned char CardType;
+typedef int CardType;
 
 #define OUTSIDE -1
 #define P0_HAND 0
@@ -38,7 +36,7 @@ typedef unsigned char CardType;
 #define LEFT_LANE 0
 #define RIGHT_LANE 3
 
-typedef char Location;
+typedef int Location;
 
 #define BREAKTHROUGH 0
 #define CHARGE 1
@@ -47,21 +45,21 @@ typedef char Location;
 #define LETHAL 4
 #define WARD 5
 
-typedef unsigned char Keyword;
+typedef int Keyword;
 
 typedef struct Card {
     int id, instance_id;
     CardType type;
-    int8 cost, attack, defense, player_hp, enemy_hp, card_draw, lane;
+    int cost, attack, defense, player_hp, enemy_hp, card_draw, lane;
     unsigned char keywords;
     Location location;
     Bool can_attack;
 } Card;
 
 typedef struct Player {
-    uint8 id;
-    int8 health, base_mana, bonus_mana, mana, next_rune, bonus_draw;
-    uint8 deck_size, hand_size, left_lane_size, right_lane_size;
+    int id;
+    int health, base_mana, bonus_mana, mana, next_rune, bonus_draw;
+    int deck_size, hand_size, left_lane_size, right_lane_size;
 } Player;
 
 # define MAX_CARDS_HAND 8
@@ -75,7 +73,7 @@ typedef struct Player {
 #define ATTACK_START_INDEX 73
 
 typedef struct State {
-    uint8 round;
+    int round;
     Player *current_player, *opposing_player;
 
     Player players[2];
@@ -88,26 +86,26 @@ typedef struct State {
 
     Bool valid_actions[97];
 
-    int8 winner;
+    int winner;
 } State;
 
 /* Card functions */
 Bool has_keyword(Card card, Keyword keyword);
 void add_keyword(Card* card, Keyword keyword);
 void remove_keyword(Card* card, Keyword keyword);
-int8 damage_creature(Card* creature, int8 amount);
+int damage_creature(Card* creature, int amount);
 
 /* Player functions */
 void init_player(Player* player, int id);
-int8 damage_player(Player* player, int8 amount);
+int damage_player(Player* player, int amount);
 
 /* State functions */
 State* new_state();
-int8 calculate_valid_actions(State* state);
-void act_on_state(State* state, uint8 action_index);
+int calculate_valid_actions(State* state);
+void act_on_state(State* state, int action_index);
 State* copy_state(State* state, State* copied_state);
 
 /* Util functions */
-Action decode_action(uint8 action);
+Action decode_action(int action);
 
 #endif //NARSET_ENGINE_H

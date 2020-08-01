@@ -18,8 +18,8 @@
 float logs[LOGS_TO_PRECOMPUTE];
 
 typedef struct Node {
-    int8 action;
-    int8 current_player;
+    int action;
+    int current_player;
 
     int rewards, visits;
 
@@ -28,13 +28,13 @@ typedef struct Node {
     struct Node *right_sibling;
 
     int height;
-    int8 unvisited_children, children;
+    int unvisited_children, children;
 } Node;
 
 Node* preallocated_nodes;
 int amount_of_nodes;
 int next_node;
 
-int8* act(State* state);
+int* act(State* state);
 
 #endif //NARSET_ISMCTS_H

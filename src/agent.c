@@ -1,8 +1,9 @@
 #pragma clang diagnostic push
+#pragma ide diagnostic ignored "EndlessLoop"
 #pragma ide diagnostic ignored "cert-err34-c"
-#include <sys/time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "agent.h"
 #include "engine.h"
 #include "ismcts.h"
@@ -12,19 +13,19 @@ void state_from_native_input(State* state) {
     Player *en = state->opposing_player;
 
     // read player info
-    scanf("%hhd%hhd%hhd%hhd%*d", &pl->health, &pl->base_mana, &pl->deck_size,
+    scanf("%d%d%d%d%*d", &pl->health, &pl->base_mana, &pl->deck_size,
             &pl->next_rune);
     pl->mana = pl->base_mana;
 
     // read opponent info
-    scanf("%hhd%hhd%hhd%hhd%hhd", &en->health, &en->base_mana, &en->deck_size,
+    scanf("%d%d%d%d%d", &en->health, &en->base_mana, &en->deck_size,
           &en->next_rune, &en->bonus_draw);
     en->bonus_draw -= 1; // adjust to our meaning of bonus draw
     en->mana = en->base_mana;
 
     // read amount of cards in opponent's hand and past actions
     int op_actions;
-    scanf("%hhd%d", &en->hand_size, &op_actions); fgetc(stdin);
+    scanf("%d%d", &en->hand_size, &op_actions); fgetc(stdin);
     for (int i = 0; i < op_actions; i++) {
         char card_number_and_action[21];
         fgets(card_number_and_action, 21, stdin);
@@ -51,7 +52,7 @@ void state_from_native_input(State* state) {
         Card card = {};
         char abilities[7];
 
-        scanf("%d%d%hhd%hhd%hhd%hhd%hhd%s%hhd%hhd%hhd%hhd", &card.id,
+        scanf("%d%d%d%d%d%d%d%s%d%d%d%d", &card.id,
                 &card.instance_id, &card.location, &card.type, &card.cost,
                 &card.attack, &card.defense, abilities, &card.player_hp,
                 &card.enemy_hp, &card.card_draw, &card.lane);
@@ -151,14 +152,14 @@ void state_to_native_input(State* state) {
     }
 }
 
-char* action_index_to_native_action(State* state, uint8 action_index) {
+char* action_index_to_native_action(State* state, int action_index) {
     // initialize shortcut
     Player *player = state->current_player;
 
     Action action = decode_action(action_index);
 
     char *type;
-    int8 origin, target;
+    int origin, target;
     switch (action.type) {
         case PASS: return "PASS";
         case SUMMON:
@@ -200,55 +201,38 @@ char* action_index_to_native_action(State* state, uint8 action_index) {
 }
 
 int main() {
-    struct timeval time;
-    gettimeofday(&time, NULL);
+    srandom(clock());
 
-    srandom((time.tv_sec * 1000) + (time.tv_usec / 1000));
-    //srandom(5);
+    State *state;
 
-    // initialize state
-    State *state = new_state();
-    state_from_native_input(state);
-    calculate_valid_actions(state);
+    while (TRUE) {
+        // read game state
+        state = new_state();
+        state_from_native_input(state);
 
-    printf("Received state:\n");
-    state_to_native_input(state);
+        //printf("Received state:\n");
+        //state_to_native_input(state);
 
-    printf("\nValid actions:\n");
-    printf("PASS: %d\n", state->valid_actions[0]);
+        if (state->current_player->mana == 0) { // if it's draft
+            printf("PICK %d\n", (int) random() % 3);
+        } else { // if it's battle
+            int *actions = act(state);
 
-    printf("SUMMON: ");
-    for (int i = SUMMON_START_INDEX; i < SUMMON_START_INDEX + 16; ++i) {
-        printf("%d ", state->valid_actions[i]);
+            int i;
+            for (i = 0; i < MAX_ACTIONS && actions[i] != 0; i++) {
+                char *native_action = action_index_to_native_action(state, actions[i]);
+                printf("%s; ", native_action);
+                free(native_action);
+
+                act_on_state(state, actions[i]);
+            }
+
+            if (i == 0) printf("PASS");
+
+            printf("\n");
+        }
+
+        free(state);
     }
-    printf("\n");
-
-    printf("USE: ");
-    for (int i = USE_START_INDEX; i < USE_START_INDEX + 56; ++i) {
-        printf("%d ", state->valid_actions[i]);
-    }
-    printf("\n");
-
-    printf("ATTACK: ");
-    for (int i = ATTACK_START_INDEX; i < ATTACK_START_INDEX + 24; ++i) {
-        printf("%d ", state->valid_actions[i]);
-    }
-    printf("\n");
-
-    int8 *actions = act(state);
-
-    printf("Chosen actions: ");
-
-    for (int i = 0; i < MAX_ACTIONS && actions[i] != 0; i++) {
-        char *native_action = action_index_to_native_action(state, actions[i]);
-        printf("%s; ", native_action);
-        act_on_state(state, actions[i]);
-
-        free(native_action);
-    }
-
-    printf("\n");
-
-    free(state);
 }
 #pragma clang diagnostic pop

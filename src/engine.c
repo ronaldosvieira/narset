@@ -21,13 +21,13 @@ void remove_keyword(Card* card, Keyword keyword) {
     card->keywords &= ~((unsigned int) 1 << keyword);
 }
 
-int8 damage_creature(Card* creature, int8 amount) {
-    if (amount <= 0) return (int8) 0;
+int damage_creature(Card* creature, int amount) {
+    if (amount <= 0) return (int) 0;
 
     if (has_keyword(*creature, WARD)) {
         remove_keyword(creature, WARD);
 
-        return (int8) 0;
+        return (int) 0;
     }
 
     creature->defense -= amount;
@@ -51,7 +51,7 @@ void init_player(Player* player, int id) {
     player->deck_size = 30;
 }
 
-int8 damage_player(Player* player, int8 amount) {
+int damage_player(Player* player, int amount) {
     player->health -= amount;
 
     while (player->health <= player->next_rune
@@ -96,14 +96,14 @@ State* new_state() {
     return state;
 }
 
-int8 calculate_valid_actions(State* state) {
+int calculate_valid_actions(State* state) {
     // initialize shortcuts
     Player *player = state->current_player;
     Player *opponent = state->opposing_player;
     Bool *actions = state->valid_actions;
 
     // initialize amount of valid actions
-    int8 amount = 0;
+    int amount = 0;
 
     // valid actions have already been calculated
     if (actions[0] != NONE) {
@@ -215,7 +215,7 @@ int8 calculate_valid_actions(State* state) {
     return amount;
 }
 
-void do_summon(State* state, int8 origin, int8 lane) {
+void do_summon(State* state, int origin, int lane) {
     // initialize shortcut
     Player *player = state->current_player;
     Player *opponent = state->opposing_player;
@@ -251,7 +251,7 @@ void do_summon(State* state, int8 origin, int8 lane) {
     damage_player(opponent, -creature.enemy_hp);
 }
 
-void do_use(State* state, int8 origin, int8 target) {
+void do_use(State* state, int origin, int target) {
     // initialize shortcuts
     Player *player = state->current_player;
     Player *opponent = state->opposing_player;
@@ -305,17 +305,17 @@ void do_use(State* state, int8 origin, int8 target) {
     damage_player(opponent, -item.enemy_hp);
 }
 
-void do_attack(State* state, int8 origin, int8 target) {
+void do_attack(State* state, int origin, int target) {
     // initialize shortcut
     Card *attacker = &state->player_board[origin];
 
-    int8 damage_dealt;
+    int damage_dealt;
 
     if (target == NONE) { // if target is the opponent
         damage_dealt = damage_player(state->opposing_player, attacker->attack);
     } else { // if target is a creature
         Card *defender = &state->opp_board[target];
-        int8 old_target_defense = defender->defense;
+        int old_target_defense = defender->defense;
 
         // deal damage to defender
         damage_dealt = damage_creature(defender, attacker->attack);
@@ -326,7 +326,7 @@ void do_attack(State* state, int8 origin, int8 target) {
         if (has_keyword(*defender, LETHAL)) attacker->defense = 0;
 
         // deal damage to opponent if attacker has breakthrough
-        int8 excess_damage = damage_dealt - old_target_defense;
+        int excess_damage = damage_dealt - old_target_defense;
 
         if (has_keyword(*attacker, BREAKTHROUGH) && excess_damage > 0)
             damage_player(state->opposing_player, excess_damage);
@@ -430,7 +430,7 @@ int remove_dead_creatures(Card lane[], int board_size) {
     return dead_creatures;
 }
 
-void act_on_state(State* state, uint8 action_index) {
+void act_on_state(State* state, int action_index) {
     // initialize shortcuts
     Player *player = state->current_player;
     Player *opponent = state->opposing_player;
@@ -487,10 +487,10 @@ State* copy_state(State* state, State* copied_state) {
 }
 
 /* Util actions */
-Action decode_action(uint8 action) {
+Action decode_action(int action) {
     ActionType type = PASS;
-    int8 origin = NONE;
-    int8 target = NONE;
+    int origin = NONE;
+    int target = NONE;
 
     if (action >= ATTACK_START_INDEX) {
         action -= ATTACK_START_INDEX;
