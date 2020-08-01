@@ -231,6 +231,7 @@ int main() {
     int draft_turn = 0;
     State *state;
     Card draft_options[30][3];
+    int our_choices[30];
 
     while (TRUE) {
         // keep track of time
@@ -255,6 +256,9 @@ int main() {
 
             // ask the network which card to choose
             int action = predict(input_matrix);
+
+            // store our choices
+            our_choices[draft_turn - 1] = action;
 
             // print action
             printf("PICK %d\n", action); fflush(stdout);
