@@ -203,6 +203,9 @@ int main() {
     State *state;
 
     while (TRUE) {
+        // keep track of time
+        clock_t start_time = clock();
+
         // read game state
         state = new_state();
         state_from_native_input(state);
@@ -210,24 +213,29 @@ int main() {
         //printf("Received state:\n");
         //state_to_native_input(state);
 
-        if (state->current_player->mana == 0) { // if it's draft
-            printf("PICK %d\n", (int) random() % 3);
+        if (state->current_player->base_mana == 0) { // if it's draft
+            printf("PICK %d\n", (int) random() % 3); fflush(stdout);
         } else { // if it's battle
             int *actions = act(state);
 
             int i;
             for (i = 0; i < MAX_ACTIONS && actions[i] != 0; i++) {
                 char *native_action = action_index_to_native_action(state, actions[i]);
-                printf("%s; ", native_action);
+                printf("%s; ", native_action); fflush(stdout);
                 free(native_action);
 
                 act_on_state(state, actions[i]);
             }
 
-            if (i == 0) printf("PASS");
+            if (i == 0) {
+                printf("PASS"); fflush(stdout);
+            }
 
-            printf("\n");
+            printf("\n"); fflush(stdout);
         }
+
+        debug_print("Total time elapsed: %.3f seg\n",
+                    (double) (clock() - start_time) / CLOCKS_PER_SEC);
 
         free(state);
     }
