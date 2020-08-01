@@ -264,7 +264,7 @@ int main() {
             printf("PICK %d\n", action); fflush(stdout);
         } else { // if it's battle
             // ask MCTS which actions to perform
-            int *actions = act(state);
+            int *actions = act(state, draft_options, our_choices);
 
             // print actions
             int i;

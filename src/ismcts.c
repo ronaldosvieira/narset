@@ -197,7 +197,7 @@ void choose_best(Node* root, int* actions) {
     actions[i] = 0;
 }
 
-int* act(State* state) {
+int* act(State* state, Card draft_options[30][3], int player_choices[30]) {
     clock_t start_time = clock();
 
     int valid_actions = calculate_valid_actions(state);
@@ -220,8 +220,21 @@ int* act(State* state) {
     for (int i = 1; TRUE; i++) {
          state_copy = copy_state(state, state_copy);
 
-        // todo: determinize the state
+        // determinize the player's deck
+        for (int j = 0; j < state_copy->current_player->deck_size; j++)
+            state_copy->decks[state_copy->current_player->id][j] =
+                    draft_options[j][player_choices[j]];
 
+        // determinize the opponents's deck
+        for (int j = 0; j < state_copy->opposing_player->deck_size; j++)
+            state_copy->decks[state_copy->opposing_player->id][j] =
+                    draft_options[j][random() % 3];
+
+        // determinize the opponent's hand
+        for (int j = 0; j < state_copy->opposing_player->hand_size; j++)
+            state_copy->opp_hand[j] = draft_options[30 - j - 1][random() % 3];
+
+        // perform a rollout
         do_rollout(root, state_copy);
 
         if (i % 100 == 0) {
