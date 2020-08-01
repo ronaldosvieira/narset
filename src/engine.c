@@ -465,9 +465,7 @@ void act_on_state(State* state, uint8 action_index) {
         state->winner = 0;
 }
 
-State* copy_state(State* state) {
-    State *copied_state = malloc(sizeof(State));
-
+State* copy_state(State* state, State* copied_state) {
     memcpy(copied_state, state, sizeof(State));
 
     // update pointers

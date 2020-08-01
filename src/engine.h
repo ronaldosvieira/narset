@@ -105,7 +105,7 @@ int8 damage_player(Player* player, int8 amount);
 State* new_state();
 int8 calculate_valid_actions(State* state);
 void act_on_state(State* state, uint8 action_index);
-State* copy_state(State* state);
+State* copy_state(State* state, State* copied_state);
 
 /* Util functions */
 Action decode_action(uint8 action);

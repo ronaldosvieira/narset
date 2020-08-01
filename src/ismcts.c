@@ -185,7 +185,7 @@ int8* act(State* state) {
                  .height = 0};
 
     for (int i = 1; TRUE; i++) {
-        State *state_copy = copy_state(state);
+         state_copy = copy_state(state, state_copy);
 
         // todo: determinize the state
 
