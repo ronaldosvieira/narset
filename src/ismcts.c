@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
 #include "ismcts.h"
 
 int LOGS_ARE_PRECOMPUTED = FALSE;
@@ -251,21 +252,23 @@ int* act(State* state, Card* draft_options, int* player_choices) {
         for (int j = 0; j < state_copy->current_player->deck_size; j++) {
             Card card = draft_options[3 * j + player_choices[j]];
             card.instance_id = fake_instance_id++;
-            state_copy->decks[state_copy->current_player->id][j] = card;
+            memcpy(&state_copy->decks[state_copy->current_player->id][j],
+                   &card, sizeof(Card));
         }
 
         // determinize the opponents's deck
         for (int j = 0; j < state_copy->opposing_player->deck_size; j++) {
             Card card = draft_options[3 * j + random() % 3];
             card.instance_id = fake_instance_id++;
-            state_copy->decks[state_copy->opposing_player->id][j] = card;
+            memcpy(&state_copy->decks[state_copy->opposing_player->id][j],
+                   &card, sizeof(Card));
         }
 
         // determinize the opponent's hand
         for (int j = 0; j < state_copy->opposing_player->hand_size; j++) {
             Card card = draft_options[3 * (30 - j - 1) + random() % 3];
             card.instance_id = fake_instance_id++;
-            state_copy->opp_hand[j] = card;
+            memcpy(&state_copy->opp_hand[j], &card, sizeof(Card));
         }
 
         // perform a rollout
