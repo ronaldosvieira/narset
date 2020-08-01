@@ -42,9 +42,13 @@ void init_player(Player* player, int id) {
     player->base_mana = 1;
     player->bonus_mana = 0;
     player->mana = 1;
-    player->deck_size = 30;
     player->next_rune = 25;
     player->bonus_draw = 0;
+
+    player->left_lane_size = 0;
+    player->right_lane_size = 0;
+    player->hand_size = 0;
+    player->deck_size = 30;
 }
 
 int8 damage_player(Player* player, int8 amount) {
