@@ -8,13 +8,17 @@ int LOGS_ARE_PRECOMPUTED = FALSE;
 int NODES_ARE_PREALLOCATED = FALSE;
 State *state_copy = NULL;
 
-void precompute_logs() {
-    logs[0] = 0;
+float get_log(int n) {
+    if (LOGS_ARE_PRECOMPUTED == FALSE) {
+        logs[0] = 0;
 
-    for (int i = 1; i < LOGS_TO_PRECOMPUTE; i++)
-        logs[i] = logf((float) i);
+        for (int i = 1; i < LOGS_TO_PRECOMPUTE; i++)
+            logs[i] = logf((float) i);
 
-    LOGS_ARE_PRECOMPUTED = TRUE;
+        LOGS_ARE_PRECOMPUTED = TRUE;
+    }
+
+    return n < LOGS_TO_PRECOMPUTE? logs[n] : logf((float) n);
 }
 
 Node* get_next_node() {
@@ -35,10 +39,8 @@ double uct_score(Node* node, double exploration_weight) {
     float exploitation = (float) node->rewards / (float) node->visits;
 
     int parent_visits = node->parent != NULL? node->parent->visits : 0;
-    float log_parent_visits = parent_visits < LOGS_TO_PRECOMPUTE ?
-                              logs[parent_visits] : logf((float) parent_visits);
 
-    float exploration = sqrtf(log_parent_visits / (float) node->visits);
+    float exploration = sqrtf(get_log(parent_visits) / (float) node->visits);
 
     return exploitation + exploration_weight * exploration;
 }
@@ -196,8 +198,6 @@ void choose_best(Node* root, int* actions) {
 
 int* act(State* state) {
     clock_t start_time = clock();
-
-    if (LOGS_ARE_PRECOMPUTED == FALSE) precompute_logs();
 
     next_node = 0;
 
