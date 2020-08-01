@@ -84,6 +84,7 @@ State* new_state() {
         state->decks[1][i].id = NONE;
     }
 
+    memset(state->valid_actions, (Bool) 0, sizeof(state->valid_actions));
     state->valid_actions[0] = NONE;
 
     state->winner = -1;
