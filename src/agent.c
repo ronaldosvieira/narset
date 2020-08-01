@@ -230,8 +230,8 @@ int main() {
 
     int draft_turn = 0;
     State *state;
-    Card draft_options[30][3];
-    int our_choices[30];
+    Card *draft_options = malloc(30 * 3 * sizeof(Card));
+    int *our_choices = malloc(30 * sizeof(int));
 
     while (TRUE) {
         // keep track of time
@@ -246,9 +246,9 @@ int main() {
             draft_turn++;
 
             // store draft options to aid determinization
-            draft_options[draft_turn - 1][0] = state->player_hand[0];
-            draft_options[draft_turn - 1][1] = state->player_hand[1];
-            draft_options[draft_turn - 1][2] = state->player_hand[2];
+            draft_options[3 * (draft_turn - 1) + 0] = state->player_hand[0];
+            draft_options[3 * (draft_turn - 1) + 1] = state->player_hand[1];
+            draft_options[3 * (draft_turn - 1) + 2] = state->player_hand[2];
 
             // encode state features into a matrix
             double input_matrix[3 * 16];

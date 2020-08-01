@@ -35,6 +35,6 @@ Node* preallocated_nodes;
 int amount_of_nodes;
 int next_node;
 
-int* act(State* state, Card draft_options[30][3], int player_choices[30]);
+int* act(State* state, Card* draft_options, int* player_choices);
 
 #endif //NARSET_ISMCTS_H

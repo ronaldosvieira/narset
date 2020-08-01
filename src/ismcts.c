@@ -197,7 +197,29 @@ void choose_best(Node* root, int* actions) {
     actions[i] = 0;
 }
 
-int* act(State* state, Card draft_options[30][3], int player_choices[30]) {
+void shuffle_draft_options(Card* draft_options, int* player_choices) {
+    size_t i;
+    for (i = 0; i < 30 - 1; i++)
+    {
+        size_t j = i + random() / (RAND_MAX / (30 - i) + 1);
+
+        Card temp_do[3] = {draft_options[3 * j + 0],
+                           draft_options[3 * j + 1],
+                           draft_options[3 * j + 2]};
+        draft_options[3 * j + 0] = draft_options[3 * i + 0];
+        draft_options[3 * j + 1] = draft_options[3 * i + 1];
+        draft_options[3 * j + 2] = draft_options[3 * i + 2];
+        draft_options[3 * i + 0] = temp_do[0];
+        draft_options[3 * i + 1] = temp_do[1];
+        draft_options[3 * i + 2] = temp_do[2];
+
+        int temp_pc = player_choices[j];
+        player_choices[j] = player_choices[i];
+        player_choices[i] = temp_pc;
+    }
+}
+
+int* act(State* state, Card* draft_options, int* player_choices) {
     clock_t start_time = clock();
 
     int valid_actions = calculate_valid_actions(state);
@@ -218,21 +240,32 @@ int* act(State* state, Card draft_options[30][3], int player_choices[30]) {
         state_copy = malloc(sizeof(State));
 
     for (int i = 1; TRUE; i++) {
-         state_copy = copy_state(state, state_copy);
+        state_copy = copy_state(state, state_copy);
+
+        shuffle_draft_options(draft_options, player_choices);
+
+        int fake_instance_id = 1000;
 
         // determinize the player's deck
-        for (int j = 0; j < state_copy->current_player->deck_size; j++)
-            state_copy->decks[state_copy->current_player->id][j] =
-                    draft_options[j][player_choices[j]];
+        for (int j = 0; j < state_copy->current_player->deck_size; j++) {
+            Card card = draft_options[3 * j + player_choices[j]];
+            card.instance_id = fake_instance_id++;
+            state_copy->decks[state_copy->current_player->id][j] = card;
+        }
 
         // determinize the opponents's deck
-        for (int j = 0; j < state_copy->opposing_player->deck_size; j++)
-            state_copy->decks[state_copy->opposing_player->id][j] =
-                    draft_options[j][random() % 3];
+        for (int j = 0; j < state_copy->opposing_player->deck_size; j++) {
+            Card card = draft_options[3 * j + random() % 3];
+            card.instance_id = fake_instance_id++;
+            state_copy->decks[state_copy->opposing_player->id][j] = card;
+        }
 
         // determinize the opponent's hand
-        for (int j = 0; j < state_copy->opposing_player->hand_size; j++)
-            state_copy->opp_hand[j] = draft_options[30 - j - 1][random() % 3];
+        for (int j = 0; j < state_copy->opposing_player->hand_size; j++) {
+            Card card = draft_options[3 * (30 - j - 1) + random() % 3];
+            card.instance_id = fake_instance_id++;
+            state_copy->opp_hand[j] = card;
+        }
 
         // perform a rollout
         do_rollout(root, state_copy);
