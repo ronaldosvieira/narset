@@ -7,6 +7,7 @@
 #include "agent.h"
 #include "engine.h"
 #include "ismcts.h"
+#include "network.h"
 
 void state_from_native_input(State* state) {
     Player *pl = state->current_player;
@@ -237,14 +238,21 @@ int main() {
         state = new_state();
         state_from_native_input(state);
 
-        //printf("Received state:\n");
-        //state_to_native_input(state);
-
         if (state->current_player->base_mana == 0) { // if it's draft
-            printf("PICK %d\n", (int) random() % 3); fflush(stdout);
+            // encode state features into a matrix
+            double input_matrix[3 * 16];
+            encode_state(state, input_matrix);
+
+            // ask the network which card to choose
+            int action = predict(input_matrix);
+
+            // print action
+            printf("PICK %d\n", action); fflush(stdout);
         } else { // if it's battle
+            // ask MCTS which actions to perform
             int *actions = act(state);
 
+            // print actions
             int i;
             for (i = 0; i < MAX_ACTIONS && actions[i] != 0; i++) {
                 char *native_action = action_index_to_native_action(state, actions[i]);
