@@ -6,6 +6,7 @@
 
 int LOGS_ARE_PRECOMPUTED = FALSE;
 int NODES_ARE_PREALLOCATED = FALSE;
+State *state_copy = NULL;
 
 void precompute_logs() {
     logs[0] = 0;
@@ -194,20 +195,22 @@ int8* act(State* state) {
 
     int8 valid_actions = calculate_valid_actions(state);
 
-    Node root = {.action = -1,
-                 .current_player = state->current_player->id,
-                 .children = valid_actions,
-                 .unvisited_children = valid_actions,
-                 .height = 0};
+    Node *root = get_next_node();
+    root->action = -1;
+    root->current_player = state->current_player->id;
+    root->children = valid_actions;
+    root->unvisited_children = valid_actions;
+    root->height = 0;
+
+    if (state_copy == NULL)
+        state_copy = malloc(sizeof(State));
 
     for (int i = 1; TRUE; i++) {
          state_copy = copy_state(state, state_copy);
 
         // todo: determinize the state
 
-        do_rollout(&root, state_copy);
-
-        free(state_copy);
+        do_rollout(root, state_copy);
 
         if (i % 100 == 0) {
             double time_elapsed = (double) (clock() - start_time) / CLOCKS_PER_SEC;
@@ -222,7 +225,7 @@ int8* act(State* state) {
 
     int8 *actions = calloc(0, MAX_ACTIONS * sizeof(int8));
 
-    choose_best(&root, actions);
+    choose_best(root, actions);
 
     free(preallocated_nodes);
     amount_of_nodes = 0;
