@@ -153,9 +153,6 @@ void state_to_native_input(State* state) {
 }
 
 char* action_index_to_native_action(State* state, int action_index) {
-    // initialize shortcut
-    Player *player = state->current_player;
-
     Action action = decode_action(action_index);
 
     char *type;
@@ -186,7 +183,7 @@ char* action_index_to_native_action(State* state, int action_index) {
             break;
         case ATTACK:
             type = "ATTACK";
-            origin = state->player_board[action.target].instance_id;
+            origin = state->player_board[action.origin].instance_id;
 
             if (action.target == NONE) target = action.target;
             else target = state->opp_board[action.target].instance_id;
