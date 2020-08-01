@@ -10,10 +10,6 @@
 void state_from_native_input(State* state) {
     Player *pl = state->current_player;
     Player *en = state->opposing_player;
-    Card *player_hand = &state->cards[pl->id == 0? P0_HAND : P1_HAND];
-    Card *player_board = &state->cards[pl->id == 0? P0_BOARD : P1_BOARD];
-    Card *opp_hand = &state->cards[pl->id == 0? P1_HAND : P0_HAND];
-    Card *opp_board = &state->cards[pl->id == 0? P1_BOARD : P0_BOARD];
 
     // read player info
     scanf("%hhd%hhd%hhd%hhd%*d", &pl->health, &pl->base_mana, &pl->deck_size,
@@ -36,8 +32,8 @@ void state_from_native_input(State* state) {
 
     // populate opponent's hand with fake cards
     for (int i = 0; i < en->hand_size; i++)
-        opp_hand[i] = (Card) {.id = UNKNOWN, .instance_id = UNKNOWN, .cost = 1,
-                              .attack = 1, .defense = 1};
+        state->opp_hand[i] = (Card) {.id = UNKNOWN, .instance_id = UNKNOWN,
+                                     .cost = 1, .attack = 1, .defense = 1};
 
     // populate decks with fake cards
     for (int i = 0; i < pl->deck_size; i++)
@@ -66,21 +62,21 @@ void state_from_native_input(State* state) {
 
         // add new card and increment appropriate counter
         if (card.location == 0)
-            player_hand[state->current_player->hand_size++] = card;
+            state->player_hand[pl->hand_size++] = card;
         else if (card.location == 1) {
             card.can_attack = TRUE;
 
             if (card.lane == 0)
-                player_board[LEFT_LANE + state->current_player->left_lane_size++] = card;
+                state->player_board[LEFT_LANE + pl->left_lane_size++] = card;
             else if (card.lane == 1)
-                player_board[RIGHT_LANE + state->current_player->right_lane_size++] = card;
+                state->player_board[RIGHT_LANE + pl->right_lane_size++] = card;
         } else if (card.location == -1) {
             card.can_attack = TRUE;
 
             if (card.lane == 0)
-                opp_board[LEFT_LANE + state->opposing_player->left_lane_size++] = card;
+                state->opp_board[LEFT_LANE + en->left_lane_size++] = card;
             else if (card.lane == 1)
-                opp_board[RIGHT_LANE + state->opposing_player->right_lane_size++] = card;
+                state->opp_board[RIGHT_LANE + en->right_lane_size++] = card;
         }
     }
 }
@@ -89,9 +85,6 @@ void state_to_native_input(State* state) {
     // initialize shortcuts
     Player *pl = state->current_player;
     Player *op = state->opposing_player;
-    Card *player_hand = &state->cards[pl->id == 0 ? P0_HAND : P1_HAND];
-    Card *player_board = &state->cards[pl->id == 0 ? P0_BOARD : P1_BOARD];
-    Card *opp_board = &state->cards[pl->id == 0 ? P1_BOARD : P0_BOARD];
 
     // print players info
     printf("%d %d %d %d %d\n", pl->health, pl->base_mana + pl->bonus_mana,
@@ -108,7 +101,7 @@ void state_to_native_input(State* state) {
 
     // print cards in current player's hand
     for (int i = 0; i < pl->hand_size; i++) {
-        Card *card = &player_hand[i];
+        Card *card = &state->player_hand[i];
 
         char abilities[7] = "BCDGLW\0";
 
@@ -123,7 +116,7 @@ void state_to_native_input(State* state) {
 
     // print cards in current player's board
     for (int i = 0; i < 6; i++) {
-        Card *card = &player_board[i];
+        Card *card = &state->player_board[i];
 
         if (card->id == NONE)
             continue;
@@ -141,7 +134,7 @@ void state_to_native_input(State* state) {
 
     // print cards in opposing player's board
     for (int i = 0; i < 6; i++) {
-        Card *card = &opp_board[i];
+        Card *card = &state->opp_board[i];
 
         if (card->id == NONE)
             continue;
@@ -161,9 +154,6 @@ void state_to_native_input(State* state) {
 char* action_index_to_native_action(State* state, uint8 action_index) {
     // initialize shortcut
     Player *player = state->current_player;
-    Card *player_hand = &state->cards[player->id == 0? P0_HAND : P1_HAND];
-    Card *player_board = &state->cards[player->id == 0? P0_BOARD : P1_BOARD];
-    Card *opp_board = &state->cards[player->id == 0? P1_BOARD : P0_BOARD];
 
     Action action = decode_action(action_index);
 
@@ -173,32 +163,32 @@ char* action_index_to_native_action(State* state, uint8 action_index) {
         case PASS: return "PASS";
         case SUMMON:
             type = "SUMMON";
-            origin = player_hand[action.origin].instance_id;
+            origin = state->player_hand[action.origin].instance_id;
             target = action.target;
             break;
         case USE:
             type = "USE";
-            origin = player_hand[action.origin].instance_id;
+            origin = state->player_hand[action.origin].instance_id;
 
             if (action.target == NONE) target = action.target;
             else {
-                switch (player_hand[action.origin].type) {
+                switch (state->player_hand[action.origin].type) {
                     case GREEN_ITEM:
-                        target = player_board[action.target].instance_id;
+                        target = state->player_board[action.target].instance_id;
                         break;
                     case RED_ITEM:
                     case BLUE_ITEM:
-                        target = opp_board[action.target].instance_id;
+                        target = state->opp_board[action.target].instance_id;
                         break;
                 }
             }
             break;
         case ATTACK:
             type = "ATTACK";
-            origin = player_board[action.target].instance_id;
+            origin = state->player_board[action.target].instance_id;
 
             if (action.target == NONE) target = action.target;
-            else target = opp_board[action.target].instance_id;
+            else target = state->opp_board[action.target].instance_id;
 
             break;
     }

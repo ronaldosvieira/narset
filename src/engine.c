@@ -71,6 +71,11 @@ State* new_state() {
     state->current_player = &state->players[0];
     state->opposing_player = &state->players[1];
 
+    state->player_hand = &state->cards[P0_HAND];
+    state->player_board = &state->cards[P0_BOARD];
+    state->opp_hand = &state->cards[P1_HAND];
+    state->opp_board = &state->cards[P1_BOARD];
+
     for (int i = 0; i < CARDS_IN_STATE; i++)
         state->cards[i].id = NONE;
 
@@ -91,9 +96,6 @@ int8 calculate_valid_actions(State* state) {
     Player *player = state->current_player;
     Player *opponent = state->opposing_player;
     Bool *actions = state->valid_actions;
-    Card *player_hand = &state->cards[player->id == 0? P0_HAND : P1_HAND];
-    Card *player_board = &state->cards[player->id == 0? P0_BOARD : P1_BOARD];
-    Card *opp_board = &state->cards[player->id == 0? P1_BOARD : P0_BOARD];
 
     // initialize amount of valid actions
     int8 amount = 0;
@@ -114,7 +116,7 @@ int8 calculate_valid_actions(State* state) {
 
     // check actions available for each card in hand
     for (int i = 0; i < player->hand_size; i++) {
-        Card *card = &player_hand[i];
+        Card *card = &state->player_hand[i];
 
         // check if player has mana to cast it
         if (card->cost > player->mana)
@@ -159,25 +161,25 @@ int8 calculate_valid_actions(State* state) {
 
     // check if there are guards in the left lane
     for (int j = 0; j < opponent->left_lane_size; j++)
-        if (has_keyword(opp_board[LEFT_LANE + j], GUARD)) {
+        if (has_keyword(state->opp_board[LEFT_LANE + j], GUARD)) {
             has_guard_in_left_lane = TRUE;
             break;
         }
 
     // check if there are guards in the right lane
     for (int j = 0; j < opponent->right_lane_size; j++)
-        if (has_keyword(opp_board[RIGHT_LANE + j], GUARD)) {
+        if (has_keyword(state->opp_board[RIGHT_LANE + j], GUARD)) {
             has_guard_in_right_lane = TRUE;
             break;
         }
 
     // check attacks available for each creature in the left lane
     for (int i = 0; i < player->left_lane_size; i++) {
-        if (!player_board[LEFT_LANE + i].can_attack)
+        if (!state->player_board[LEFT_LANE + i].can_attack)
             continue;
 
         for (int j = 0; j < opponent->left_lane_size; j++) {
-            Card *creature = &opp_board[LEFT_LANE + j];
+            Card *creature = &state->opp_board[LEFT_LANE + j];
 
             if (!has_guard_in_left_lane || has_keyword(*creature, GUARD))
                 actions[ATTACK_START_INDEX + i * 4 + 1 + j] = TRUE;
@@ -189,11 +191,11 @@ int8 calculate_valid_actions(State* state) {
 
     // check attacks available for each creature in the right lane
     for (int i = 0; i < player->right_lane_size; i++) {
-        if (!player_board[RIGHT_LANE + i].can_attack)
+        if (!state->player_board[RIGHT_LANE + i].can_attack)
             continue;
 
         for (int j = 0; j < opponent->right_lane_size; j++) {
-            Card *creature = &opp_board[RIGHT_LANE + j];
+            Card *creature = &state->opp_board[RIGHT_LANE + j];
 
             if (!has_guard_in_right_lane || has_keyword(*creature, GUARD))
                 actions[ATTACK_START_INDEX + (i + 3) * 4 + 1 + j] = TRUE;
@@ -212,20 +214,18 @@ void do_summon(State* state, int8 origin, int8 lane) {
     // initialize shortcut
     Player *player = state->current_player;
     Player *opponent = state->opposing_player;
-    Card *player_hand = &state->cards[player->id == 0? P0_HAND : P1_HAND];
-    Card *player_board = &state->cards[player->id == 0? P0_BOARD : P1_BOARD];
 
     // copy card
-    Card creature = player_hand[origin];
+    Card creature = state->player_hand[origin];
 
     // spend mana
     state->current_player->mana -= creature.cost;
 
     // remove card from hand
     for (int i = origin + 1; i < player->hand_size; i++)
-        player_hand[i - 1] = player_hand[i];
+        state->player_hand[i - 1] = state->player_hand[i];
 
-    player_hand[--player->hand_size].id = NONE;
+    state->player_hand[--player->hand_size].id = NONE;
 
     // if the creature has charge, let it attack immediately
     if (has_keyword(creature, CHARGE))
@@ -236,9 +236,9 @@ void do_summon(State* state, int8 origin, int8 lane) {
 
     // add creature to board
     if (lane == 0)
-        player_board[LEFT_LANE + player->left_lane_size++] = creature;
+        state->player_board[LEFT_LANE + player->left_lane_size++] = creature;
     else
-        player_board[RIGHT_LANE + player->right_lane_size++] = creature;
+        state->player_board[RIGHT_LANE + player->right_lane_size++] = creature;
 
     // trigger enter-the-board abilities
     player->bonus_draw += creature.card_draw;
@@ -250,27 +250,24 @@ void do_use(State* state, int8 origin, int8 target) {
     // initialize shortcuts
     Player *player = state->current_player;
     Player *opponent = state->opposing_player;
-    Card *player_hand = &state->cards[player->id == 0? P0_HAND : P1_HAND];
-    Card *player_board = &state->cards[player->id == 0? P0_BOARD : P1_BOARD];
-    Card *opp_board = &state->cards[player->id == 0? P1_BOARD : P0_BOARD];
 
     // copy card
-    Card item = player_hand[origin];
+    Card item = state->player_hand[origin];
 
     // spend mana
     player->mana -= item.cost;
 
     // remove card from hand
     for (int i = origin + 1; i < player->hand_size; i++)
-        player_hand[i - 1] = player_hand[i];
+        state->player_hand[i - 1] = state->player_hand[i];
 
-    player_hand[--player->hand_size].id = NONE;
+    state->player_hand[--player->hand_size].id = NONE;
 
     Card *creature;
 
     switch (item.type) {
         case GREEN_ITEM:
-            creature = &player_board[target];
+            creature = &state->player_board[target];
 
             creature->attack += item.attack; // increase attack
             creature->defense += item.defense; // increase defense
@@ -284,7 +281,7 @@ void do_use(State* state, int8 origin, int8 target) {
                 break;
             } // otherwise treat as a red item
         case RED_ITEM:
-            creature = &opp_board[target];
+            creature = &state->opp_board[target];
 
             creature->attack -= item.attack; // decrease attack
             damage_creature(creature, -item.defense); // decrease defense
@@ -304,19 +301,15 @@ void do_use(State* state, int8 origin, int8 target) {
 }
 
 void do_attack(State* state, int8 origin, int8 target) {
-    // initialize shortcuts
-    Player *player = state->current_player;
-    Player *opponent = state->opposing_player;
-    Card *player_board = &state->cards[player->id == 0? P0_BOARD : P1_BOARD];
-    Card *opp_board = &state->cards[player->id == 0? P1_BOARD : P0_BOARD];
-    Card *attacker = &player_board[origin];
+    // initialize shortcut
+    Card *attacker = &state->player_board[origin];
 
     int8 damage_dealt;
 
     if (target == NONE) { // if target is the opponent
-        damage_dealt = damage_player(opponent, attacker->attack);
+        damage_dealt = damage_player(state->opposing_player, attacker->attack);
     } else { // if target is a creature
-        Card *defender = &opp_board[target];
+        Card *defender = &state->opp_board[target];
         int8 old_target_defense = defender->defense;
 
         // deal damage to defender
@@ -331,12 +324,12 @@ void do_attack(State* state, int8 origin, int8 target) {
         int8 excess_damage = damage_dealt - old_target_defense;
 
         if (has_keyword(*attacker, BREAKTHROUGH) && excess_damage > 0)
-            damage_player(opponent, excess_damage);
+            damage_player(state->opposing_player, excess_damage);
     }
 
     // heal player if attacker has drain
     if (has_keyword(*attacker, DRAIN))
-        player->health += damage_dealt;
+        state->current_player->health += damage_dealt;
 
     // prevent the creature from attacking again this round
     attacker->can_attack = FALSE;
@@ -347,10 +340,17 @@ void do_pass(State* state) {
     state->current_player = &state->players[(state->current_player->id + 1) % 2];
     state->opposing_player = &state->players[(state->opposing_player->id + 1) % 2];
 
+    // update location pointers
+    Card *temp = state->player_hand;
+    state->player_hand = state->opp_hand;
+    state->opp_hand = temp;
+
+    temp = state->player_board;
+    state->player_board = state->opp_board;
+    state->opp_board = temp;
+
     // initialize shortcuts
     Player *player = state->current_player;
-    Card *player_board = &state->cards[player->id == 0? P0_BOARD : P1_BOARD];
-    Card *player_hand = &state->cards[player->id == 0? P0_HAND : P1_HAND];
 
     // if it's first player's turn, then it's a new round
     if (player->id == 0) state->round++;
@@ -358,10 +358,10 @@ void do_pass(State* state) {
     // all creatures are able to attack
     for (int i = 0; i < 3; i++) {
         if (i < player->left_lane_size)
-            player_board[LEFT_LANE + i].can_attack = TRUE;
+            state->player_board[LEFT_LANE + i].can_attack = TRUE;
 
         if (i < player->right_lane_size)
-            player_board[RIGHT_LANE + i].can_attack = TRUE;
+            state->player_board[RIGHT_LANE + i].can_attack = TRUE;
     }
 
     // if the player spent all their mana then they spent any bonus mana
@@ -389,7 +389,7 @@ void do_pass(State* state) {
 
         if (player->deck_size > 0) { // if there are still cards to draw, then do it
             Card *top_of_deck = &state->decks[player->id][--player->deck_size];
-            player_hand[player->hand_size++] = *top_of_deck;
+            state->player_hand[player->hand_size++] = *top_of_deck;
 
             top_of_deck->id = NONE;
         } else { // else, damage the player to the closest rune
@@ -429,8 +429,6 @@ void act_on_state(State* state, uint8 action_index) {
     // initialize shortcuts
     Player *player = state->current_player;
     Player *opponent = state->opposing_player;
-    Card *player_board = &state->cards[player->id == 0? P0_BOARD : P1_BOARD];
-    Card *opp_board = &state->cards[player->id == 0? P1_BOARD : P0_BOARD];
 
     // find action type, origin and target from index
     Action action = decode_action(action_index);
@@ -450,13 +448,13 @@ void act_on_state(State* state, uint8 action_index) {
     // remove any dead creatures
     if (action.type == USE || (action.type == ATTACK && action.target != NONE)) {
         player->left_lane_size -= remove_dead_creatures(
-                &player_board[LEFT_LANE], MAX_CARDS_LANE);
+                &state->player_board[LEFT_LANE], MAX_CARDS_LANE);
         player->right_lane_size -= remove_dead_creatures(
-                &player_board[RIGHT_LANE], MAX_CARDS_LANE);
+                &state->player_board[RIGHT_LANE], MAX_CARDS_LANE);
         opponent->left_lane_size -= remove_dead_creatures(
-                &opp_board[LEFT_LANE], MAX_CARDS_LANE);
+                &state->opp_board[LEFT_LANE], MAX_CARDS_LANE);
         opponent->right_lane_size -= remove_dead_creatures(
-                &opp_board[RIGHT_LANE], MAX_CARDS_LANE);
+                &state->opp_board[RIGHT_LANE], MAX_CARDS_LANE);
     }
 
     // declare a winner, if there's any
@@ -476,6 +474,11 @@ State* copy_state(State* state) {
 
     copied_state->current_player = &copied_state->players[current_player_id];
     copied_state->opposing_player = &copied_state->players[(current_player_id + 1) % 2];
+
+    state->player_hand = &copied_state->cards[current_player_id == 0? P0_HAND : P1_HAND];
+    state->player_board = &copied_state->cards[current_player_id == 0? P0_BOARD : P1_BOARD];
+    state->opp_hand = &copied_state->cards[current_player_id == 0? P1_HAND : P0_HAND];
+    state->opp_board = &copied_state->cards[current_player_id == 0? P1_BOARD : P0_BOARD];
 
     return copied_state;
 }

@@ -83,6 +83,9 @@ typedef struct State {
     Card cards[CARDS_IN_STATE];
     Card decks[2][CARDS_IN_DECK];
 
+    Card *player_hand, *opp_hand;
+    Card *player_board, *opp_board;
+
     Bool valid_actions[97];
 
     int8 winner;
