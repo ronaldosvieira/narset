@@ -5,6 +5,7 @@
 #include "ismcts.h"
 
 int LOGS_ARE_PRECOMPUTED = FALSE;
+int NODES_ARE_PREALLOCATED = FALSE;
 
 void precompute_logs() {
     logs[0] = 0;
@@ -13,6 +14,19 @@ void precompute_logs() {
         logs[i] = logf((float) i);
 
     LOGS_ARE_PRECOMPUTED = TRUE;
+}
+
+Node* get_next_node() {
+    if (NODES_ARE_PREALLOCATED == FALSE) {
+        preallocated_nodes = malloc(NODES_TO_PREALLOCATE * sizeof(Node));
+        amount_of_nodes = NODES_ARE_PREALLOCATED;
+        next_node = 0;
+    } else if (next_node >= NODES_TO_PREALLOCATE) {
+        preallocated_nodes = realloc(preallocated_nodes,
+                                     2 * amount_of_nodes * sizeof(Node));
+    }
+
+    return &preallocated_nodes[next_node++];
 }
 
 double uct_score(Node* node, double exploration_weight) {
@@ -65,7 +79,7 @@ Node* select_node(Node* root, State* state) {
 }
 
 Node* expand(Node* node, int8 action) {
-    Node* new_leaf = malloc(sizeof(Node));
+    Node* new_leaf = get_next_node();
 
     new_leaf->parent = node;
     new_leaf->height = node->height + 1;
@@ -176,6 +190,8 @@ int8* act(State* state) {
 
     if (LOGS_ARE_PRECOMPUTED == FALSE) precompute_logs();
 
+    next_node = 0;
+
     int8 valid_actions = calculate_valid_actions(state);
 
     Node root = {.action = -1,
@@ -207,6 +223,9 @@ int8* act(State* state) {
     int8 *actions = calloc(0, MAX_ACTIONS * sizeof(int8));
 
     choose_best(&root, actions);
+
+    free(preallocated_nodes);
+    amount_of_nodes = 0;
 
     return actions;
 }
