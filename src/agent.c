@@ -248,7 +248,7 @@ int main() {
             // store draft options to aid determinization
             draft_options[draft_turn - 1][0] = state->player_hand[0];
             draft_options[draft_turn - 1][1] = state->player_hand[1];
-            draft_options[draft_turn - 1][1] = state->player_hand[2];
+            draft_options[draft_turn - 1][2] = state->player_hand[2];
 
             // encode state features into a matrix
             double input_matrix[3 * 16];
