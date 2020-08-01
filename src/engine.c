@@ -478,10 +478,10 @@ State* copy_state(State* state, State* copied_state) {
     copied_state->current_player = &copied_state->players[current_player_id];
     copied_state->opposing_player = &copied_state->players[(current_player_id + 1) % 2];
 
-    state->player_hand = &copied_state->cards[current_player_id == 0? P0_HAND : P1_HAND];
-    state->player_board = &copied_state->cards[current_player_id == 0? P0_BOARD : P1_BOARD];
-    state->opp_hand = &copied_state->cards[current_player_id == 0? P1_HAND : P0_HAND];
-    state->opp_board = &copied_state->cards[current_player_id == 0? P1_BOARD : P0_BOARD];
+    copied_state->player_hand = &copied_state->cards[current_player_id == 0? P0_HAND : P1_HAND];
+    copied_state->player_board = &copied_state->cards[current_player_id == 0? P0_BOARD : P1_BOARD];
+    copied_state->opp_hand = &copied_state->cards[current_player_id == 0? P1_HAND : P0_HAND];
+    copied_state->opp_board = &copied_state->cards[current_player_id == 0? P1_BOARD : P0_BOARD];
 
     return copied_state;
 }
