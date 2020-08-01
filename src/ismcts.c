@@ -248,7 +248,7 @@ int* act(State* state, Card draft_options[30][3], int player_choices[30]) {
         }
     }
 
-    int *actions = malloc(MAX_ACTIONS * sizeof(int));
+    int *actions = calloc(MAX_ACTIONS, sizeof(int));
 
     choose_best(root, actions);
     next_node = 0;

@@ -192,7 +192,7 @@ char* action_index_to_native_action(State* state, int action_index) {
             break;
     }
 
-    char* native_action = malloc(25 * sizeof(char));
+    char* native_action = calloc(25, sizeof(char));
     snprintf(native_action, 25, "%s %d %d", type, origin, target);
 
     return native_action;
