@@ -145,12 +145,10 @@ void do_rollout(Node* root, State* state) {
 
     // if the leaf is not terminal, expand
     if (node->children > 0) {
-        node->unvisited_children--;
-
         // find the i-th action
         int action = 0;
 
-        if (calculate_valid_actions(state) > 1) {
+        if (node->unvisited_children-- > 1) {
             int counter = 0;
             while (counter != node->children - node->unvisited_children) {
                 if (action >= 96) break;
