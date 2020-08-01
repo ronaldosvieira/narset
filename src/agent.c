@@ -228,7 +228,9 @@ double* encode_state(State* state, double* input_matrix) {
 int main() {
     srandom(clock());
 
+    int draft_turn = 0;
     State *state;
+    Card draft_options[30][3];
 
     while (TRUE) {
         // keep track of time
@@ -239,6 +241,14 @@ int main() {
         state_from_native_input(state);
 
         if (state->current_player->base_mana == 0) { // if it's draft
+            // yay, new turn!
+            draft_turn++;
+
+            // store draft options to aid determinization
+            draft_options[draft_turn - 1][0] = state->player_hand[0];
+            draft_options[draft_turn - 1][1] = state->player_hand[1];
+            draft_options[draft_turn - 1][1] = state->player_hand[2];
+
             // encode state features into a matrix
             double input_matrix[3 * 16];
             encode_state(state, input_matrix);
