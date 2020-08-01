@@ -19,12 +19,13 @@ void precompute_logs() {
 
 Node* get_next_node() {
     if (NODES_ARE_PREALLOCATED == FALSE) {
-        preallocated_nodes = malloc(NODES_TO_PREALLOCATE * sizeof(Node));
-        amount_of_nodes = NODES_ARE_PREALLOCATED;
+        preallocated_nodes = malloc(NODES_TO_PREALLOCATE * sizeof(struct Node));
+        amount_of_nodes = NODES_TO_PREALLOCATE;
         next_node = 0;
-    } else if (next_node >= NODES_TO_PREALLOCATE) {
-        preallocated_nodes = realloc(preallocated_nodes,
-                                     2 * amount_of_nodes * sizeof(Node));
+        NODES_ARE_PREALLOCATED = TRUE;
+    } else if (next_node >= amount_of_nodes) {
+        next_node++;
+        return malloc(sizeof(struct Node));
     }
 
     return &preallocated_nodes[next_node++];
@@ -239,6 +240,7 @@ int* act(State* state) {
 
     choose_best(root, actions);
 
+    NODES_ARE_PREALLOCATED = FALSE;
     free(preallocated_nodes);
     amount_of_nodes = 0;
 
