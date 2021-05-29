@@ -73,6 +73,15 @@ double uct_score(Node* node, double exploration_weight) {
     return exploitation + exploration_weight * exploration;
 }
 
+void print_node(Node* node) {
+    debug_print("[ %d", node->action);
+    while (node->parent != NULL) {
+            node = node->parent;
+            debug_print(" <- %d", node->action);
+        }
+    debug_print(" %s", "]");
+}
+
 Node* select_with_uct(Node* node, double exploration_weight) {
     Node* best_child = NULL;
     double best_score = -1.0;
@@ -87,10 +96,11 @@ Node* select_with_uct(Node* node, double exploration_weight) {
             best_child = child;
         }
 
-        if (exploration_weight == 0)
-            debug_print("stats %d -> %d: %d / %d = %.3f (height %d)\n",
-                   node->action, child->action,
-                   child->rewards, child->visits, score, child->height);
+        if (exploration_weight == 0) {
+            print_node(node);
+            debug_print(" -> %d: %d / %d = %.3f (height %d)\n",
+                        child->action, child->rewards, child->visits, score, child->height);
+        }
 
         child = child->right_sibling;
     }
