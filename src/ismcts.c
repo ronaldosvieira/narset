@@ -132,17 +132,24 @@ Node* expand(Node* node, int action) {
     return new_leaf;
 }
 
+int random_default_policy(State* state) {
+    // chose a random action
+    int valid_actions = calculate_valid_actions(state);
+    int ith_action = (int) random() % valid_actions;
+
+    // find the i-th action
+    int action = 0; int counter = 0;
+    while (counter != ith_action)
+        if (state->valid_actions[++action] == TRUE)
+            counter++;
+
+    return action;
+}
+
 int simulate(State* state) {
     while (state->winner == NONE) {
-        // chose a random action
-        int valid_actions = calculate_valid_actions(state);
-        int ith_action = (int) random() % valid_actions;
-
-        // find the i-th action
-        int action = 0; int counter = 0;
-        while (counter != ith_action)
-            if (state->valid_actions[++action] == TRUE)
-                counter++;
+        // use a random default policy
+        int action = random_default_policy(state);
 
         // apply the action
         act_on_state(state, action);
