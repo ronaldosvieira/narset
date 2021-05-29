@@ -89,16 +89,16 @@ void state_to_native_input(State* state) {
     Player *op = state->opposing_player;
 
     // print players info
-    printf("%d %d %d %d %d\n", pl->health, pl->base_mana + pl->bonus_mana,
+    debug_print("%d %d %d %d %d\n", pl->health, pl->base_mana + pl->bonus_mana,
            pl->deck_size, pl->next_rune, 1 + pl->bonus_draw);
-    printf("%d %d %d %d %d\n", op->health, op->base_mana + op->bonus_mana,
+    debug_print("%d %d %d %d %d\n", op->health, op->base_mana + op->bonus_mana,
            op->deck_size, op->next_rune, 1 + op->bonus_draw);
 
     // print size of opponent hand and no previous actions
-    printf("%d 0\n", op->hand_size);
+    debug_print("%d 0\n", op->hand_size);
 
     // print amount of cards
-    printf("%d\n", pl->hand_size + pl->left_lane_size + pl->right_lane_size +
+    debug_print("%d\n", pl->hand_size + pl->left_lane_size + pl->right_lane_size +
             op->left_lane_size + op->right_lane_size);
 
     // print cards in current player's hand
@@ -111,7 +111,7 @@ void state_to_native_input(State* state) {
             if (!has_keyword(*card, j))
                 abilities[j] = '-';
 
-        printf("%d %d 0 %d %d %d %d %s %d %d %d -1 \n", card->id, card->instance_id,
+        debug_print("%d %d 0 %d %d %d %d %s %d %d %d -1 \n", card->id, card->instance_id,
                card->type, card->cost, card->attack, card->defense, abilities,
                card->player_hp, card->enemy_hp, card->card_draw);
     }
@@ -129,7 +129,7 @@ void state_to_native_input(State* state) {
             if (!has_keyword(*card, j))
                 abilities[j] = '-';
 
-        printf("%d %d 1 %d %d %d %d %s %d %d %d %d \n", card->id, card->instance_id,
+        debug_print("%d %d 1 %d %d %d %d %s %d %d %d %d \n", card->id, card->instance_id,
                card->type, card->cost, card->attack, card->defense, abilities,
                card->player_hp, card->enemy_hp, card->card_draw, card->lane);
     }
@@ -147,7 +147,7 @@ void state_to_native_input(State* state) {
             if (!has_keyword(*card, j))
                 abilities[j] = '-';
 
-        printf("%d %d -1 %d %d %d %d %s %d %d %d %d \n", card->id, card->instance_id,
+        debug_print("%d %d -1 %d %d %d %d %s %d %d %d %d \n", card->id, card->instance_id,
                card->type, card->cost, card->attack, card->defense, abilities,
                card->player_hp, card->enemy_hp, card->card_draw, card->lane);
     }
