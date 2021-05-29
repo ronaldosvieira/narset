@@ -9,6 +9,33 @@ int LOGS_ARE_PRECOMPUTED = FALSE;
 int NODES_ARE_PREALLOCATED = FALSE;
 State *state_copy = NULL;
 
+Card card_centroids[8] = {
+        {.id = 1000, .instance_id = -1, .type = CREATURE, .cost = 5,
+         .attack = 3, .defense = 4, .player_hp = 4, .enemy_hp = 0, .card_draw = 0,
+         .keywords = 0b000001, .lane = -1, .location = OUTSIDE, .can_attack = FALSE},
+        {.id = 1001, .instance_id = -1, .type = CREATURE, .cost = 1,
+         .attack = 1, .defense = 2, .player_hp = 0, .enemy_hp = 0, .card_draw = 0,
+         .keywords = 0b000000, .lane = -1, .location = OUTSIDE, .can_attack = FALSE},
+        {.id = 1002, .instance_id = -1, .type = CREATURE, .cost = 6,
+         .attack = 5, .defense = 5, .player_hp = 0, .enemy_hp = 0, .card_draw = 0,
+         .keywords = 0b000000, .lane = -1, .location = OUTSIDE, .can_attack = FALSE},
+        {.id = 1003, .instance_id = -1, .type = RED_ITEM, .cost = 2,
+         .attack = 0, .defense = -1, .player_hp = 0, .enemy_hp = 0, .card_draw = 0,
+         .keywords = 0b000000, .lane = -1, .location = OUTSIDE, .can_attack = FALSE},
+        {.id = 1004, .instance_id = -1, .type = CREATURE, .cost = 9,
+         .attack = 8, .defense = 8, .player_hp = 0, .enemy_hp = 0, .card_draw = 0,
+         .keywords = 0b001001, .lane = -1, .location = OUTSIDE, .can_attack = FALSE},
+        {.id = 1005, .instance_id = -1, .type = RED_ITEM, .cost = 6,
+         .attack = 0, .defense = -10, .player_hp = 0, .enemy_hp = 0, .card_draw = 0,
+         .keywords = 0b111111, .lane = -1, .location = OUTSIDE, .can_attack = FALSE},
+        {.id = 1006, .instance_id = -1, .type = CREATURE, .cost = 3,
+         .attack = 2, .defense = 4, .player_hp = 0, .enemy_hp = 0, .card_draw = 0,
+         .keywords = 0b001000, .lane = -1, .location = OUTSIDE, .can_attack = FALSE},
+        {.id = 1007, .instance_id = -1, .type = CREATURE, .cost = 4,
+         .attack = 5, .defense = 2, .player_hp = 0, .enemy_hp = 0, .card_draw = 0,
+         .keywords = 0b000000, .lane = -1, .location = OUTSIDE, .can_attack = FALSE}
+};
+
 float get_log(int n) {
     if (LOGS_ARE_PRECOMPUTED == FALSE) {
         logs[0] = 0;
@@ -243,35 +270,35 @@ int* act(State* state, Card* draft_options, int* player_choices) {
     if (state_copy == NULL)
         state_copy = malloc(sizeof(State));
 
+    int fake_instance_id = 1000;
+
+    // determinize the player's deck
+    for (int j = 0; j < state->current_player->deck_size; j++) {
+        Card card = draft_options[3 * j + player_choices[j]];
+        card.instance_id = fake_instance_id++;
+        memcpy(&state->decks[state->current_player->id][j],
+               &card, sizeof(Card));
+    }
+
+    // determinize the opponents's deck
+    for (int j = 0; j < state->opposing_player->deck_size; j++) {
+        Card card = card_centroids[j % 8];
+        card.instance_id = fake_instance_id++;
+        memcpy(&state->decks[state->opposing_player->id][j],
+               &card, sizeof(Card));
+    }
+
+    // determinize the opponent's hand
+    for (int j = 0; j < state->opposing_player->hand_size; j++) {
+        Card card = card_centroids[j];
+        card.instance_id = fake_instance_id++;
+        memcpy(&state->opp_hand[j], &card, sizeof(Card));
+    }
+
+    shuffle_draft_options(draft_options, player_choices);
+
     for (int i = 1; TRUE; i++) {
         state_copy = copy_state(state, state_copy);
-
-        shuffle_draft_options(draft_options, player_choices);
-
-        int fake_instance_id = 1000;
-
-        // determinize the player's deck
-        for (int j = 0; j < state_copy->current_player->deck_size; j++) {
-            Card card = draft_options[3 * j + player_choices[j]];
-            card.instance_id = fake_instance_id++;
-            memcpy(&state_copy->decks[state_copy->current_player->id][j],
-                   &card, sizeof(Card));
-        }
-
-        // determinize the opponents's deck
-        for (int j = 0; j < state_copy->opposing_player->deck_size; j++) {
-            Card card = draft_options[3 * j + random() % 3];
-            card.instance_id = fake_instance_id++;
-            memcpy(&state_copy->decks[state_copy->opposing_player->id][j],
-                   &card, sizeof(Card));
-        }
-
-        // determinize the opponent's hand
-        for (int j = 0; j < state_copy->opposing_player->hand_size; j++) {
-            Card card = draft_options[3 * (30 - j - 1) + random() % 3];
-            card.instance_id = fake_instance_id++;
-            memcpy(&state_copy->opp_hand[j], &card, sizeof(Card));
-        }
 
         // perform a rollout
         do_rollout(root, state_copy);
