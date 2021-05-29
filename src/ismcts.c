@@ -150,6 +150,8 @@ void do_rollout(Node* root, State* state) {
         int action = 0;
 
         if (node->unvisited_children-- > 1) {
+            calculate_valid_actions(state);
+
             int counter = 0;
             while (counter != node->children - node->unvisited_children) {
                 if (action >= 96) break;
