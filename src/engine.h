@@ -28,7 +28,7 @@ typedef struct Action {
 
 typedef int CardType;
 
-#define OUTSIDE -1
+#define OUTSIDE (-1)
 #define P0_HAND 0
 #define P0_BOARD 8
 #define P1_BOARD 14
