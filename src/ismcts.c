@@ -146,10 +146,78 @@ int random_default_policy(State* state) {
     return action;
 }
 
+int max_atk_default_policy(State* state) {
+    // for each lane, try to attack
+    for (int lane = 0; lane < 2; lane++) {
+        int lane_pos = lane == 0? LEFT_LANE : RIGHT_LANE;
+
+        int first_guard_pos = -1;
+
+        // check for guards
+        for (int creature_pos = 0; creature_pos < 3; creature_pos++) {
+            Card* enemy_creature = &state->opp_board[lane_pos + creature_pos];
+
+            if (enemy_creature->id < 0) continue;
+
+            if (has_keyword(*enemy_creature, GUARD)) {
+                first_guard_pos = creature_pos;
+                break;
+            }
+        }
+
+        int best_atk_pos = -1;
+        int best_atk = -1;
+
+        // check for creatures able to attack
+        for (int creature_pos = 0; creature_pos < 3; creature_pos++) {
+            Card* friendly_creature = &state->player_board[lane_pos + creature_pos];
+
+            if (friendly_creature->id < 0) continue;
+            if (!friendly_creature->can_attack) continue;
+
+            if (friendly_creature->attack > best_atk) {
+                best_atk = friendly_creature->attack;
+                best_atk_pos = creature_pos;
+            }
+        }
+
+        if (best_atk_pos != -1) {
+            return ATTACK_START_INDEX + (best_atk_pos + (3 * lane)) * 4 + 1 + first_guard_pos;
+        }
+    }
+
+    int best_atk_pos = -1;
+    int best_atk = -1;
+
+    // check for creature cards able to be cast
+    for (int card_pos = 0; card_pos < state->current_player->hand_size; card_pos++) {
+        Card* card_in_hand = &state->player_hand[card_pos];
+
+        if (card_in_hand->id < 0) continue;
+        if (card_in_hand->type != CREATURE) continue;
+        if (card_in_hand->cost > state->current_player->mana) continue;
+
+        if (card_in_hand->attack > best_atk) {
+            best_atk = card_in_hand->attack;
+            best_atk_pos = card_pos;
+        }
+    }
+
+    if (best_atk_pos != -1) {
+        if (state->current_player->left_lane_size < 3) {
+            return SUMMON_START_INDEX + (best_atk_pos * 2);
+        } else if (state->current_player->right_lane_size < 3) {
+            return SUMMON_START_INDEX + (best_atk_pos * 2) + 1;
+        }
+    }
+
+    return 0;
+}
+
 int simulate(State* state) {
     while (state->winner == NONE) {
         // use a random default policy
-        int action = random_default_policy(state);
+        int action = max_atk_default_policy(state);
 
         // apply the action
         act_on_state(state, action);
