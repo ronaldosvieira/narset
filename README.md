@@ -1,2 +1,2 @@
 # narset
-MCTS-based agent for Legends of Code and Magic
+IS-MCTS agent for Legends of Code and Magic (WIP)
