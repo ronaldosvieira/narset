@@ -13,8 +13,7 @@
 #define EXPLORATION_WEIGHT 0.5
 #define MAX_ACTIONS 15
 #define LOGS_TO_PRECOMPUTE 30000
-#define NODES_TO_PREALLOCATE 50000
-#define STATES_TO_PREALLOCATE 50000
+#define NODES_TO_PREALLOCATE 100000
 
 float logs[LOGS_TO_PRECOMPUTE];
 
@@ -31,13 +30,12 @@ typedef struct Node {
     int height;
     int unvisited_children, children;
 
-    State* state;
+    Bool valid_actions[97];
 } Node;
 
 Node* preallocated_nodes;
-State* preallocated_states;
-int amount_of_nodes, amount_of_states;
-int next_node, next_state;
+int amount_of_nodes;
+int next_node;
 
 int* act(State* state, Card* draft_options, int* player_choices);
 
