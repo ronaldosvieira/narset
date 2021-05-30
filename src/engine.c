@@ -469,21 +469,21 @@ void act_on_state(State* state, int action_index) {
         state->winner = 0;
 }
 
-State* copy_state(State* state, State* copied_state) {
-    memcpy(copied_state, state, sizeof(State));
+State* copy_state(State* from, State* to) {
+    memcpy(to, from, sizeof(State));
 
     // update pointers
-    int current_player_id = state->current_player->id;
+    int current_player_id = from->current_player->id;
 
-    copied_state->current_player = &copied_state->players[current_player_id];
-    copied_state->opposing_player = &copied_state->players[(current_player_id + 1) % 2];
+    to->current_player = &to->players[current_player_id];
+    to->opposing_player = &to->players[(current_player_id + 1) % 2];
 
-    copied_state->player_hand = &copied_state->cards[current_player_id == 0? P0_HAND : P1_HAND];
-    copied_state->player_board = &copied_state->cards[current_player_id == 0? P0_BOARD : P1_BOARD];
-    copied_state->opp_hand = &copied_state->cards[current_player_id == 0? P1_HAND : P0_HAND];
-    copied_state->opp_board = &copied_state->cards[current_player_id == 0? P1_BOARD : P0_BOARD];
+    to->player_hand = &to->cards[current_player_id == 0 ? P0_HAND : P1_HAND];
+    to->player_board = &to->cards[current_player_id == 0 ? P0_BOARD : P1_BOARD];
+    to->opp_hand = &to->cards[current_player_id == 0 ? P1_HAND : P0_HAND];
+    to->opp_board = &to->cards[current_player_id == 0 ? P1_BOARD : P0_BOARD];
 
-    return copied_state;
+    return to;
 }
 
 /* Util actions */
