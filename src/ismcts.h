@@ -5,14 +5,14 @@
 #include <math.h>
 #include "engine.h"
 
-#define DEBUG 0
+#define DEBUG 1
 
 #define debug_print(fmt, ...) \
             do { if (DEBUG) fprintf(stderr, fmt, __VA_ARGS__); } while (0)
 
 #define EXPLORATION_WEIGHT 0.5
 #define MAX_ACTIONS 15
-#define LOGS_TO_PRECOMPUTE 1000
+#define LOGS_TO_PRECOMPUTE 30000
 #define NODES_TO_PREALLOCATE 100000
 
 float logs[LOGS_TO_PRECOMPUTE];
