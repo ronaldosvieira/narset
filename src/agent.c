@@ -7,7 +7,7 @@
 #include "agent.h"
 #include "engine.h"
 #include "ismcts.h"
-#include "network.h"
+#include "draft.h"
 
 void state_from_native_input(State* state) {
     Player *pl = state->current_player;
@@ -198,33 +198,6 @@ char* action_index_to_native_action(State* state, int action_index) {
     return native_action;
 }
 
-double* encode_state(State* state, double* input_matrix) {
-    for (int i = 0; i < 3; i++) {
-        Card* card = &state->player_hand[i];
-
-        int card_defense = card->defense >= -12? card->defense : -12;
-
-        input_matrix[i * 16 + 0] = card->type == 0? 1. : 0.;
-        input_matrix[i * 16 + 1] = card->type == 1? 1. : 0.;
-        input_matrix[i * 16 + 2] = card->type == 2? 1. : 0.f;
-        input_matrix[i * 16 + 3] = card->type == 3? 1. : 0.;
-        input_matrix[i * 16 + 4] = (float) card->cost / 12.;
-        input_matrix[i * 16 + 5] = (float) card->attack / 12.;
-        input_matrix[i * 16 + 6] = (float) card_defense / 12.;
-        input_matrix[i * 16 + 7] = (float) card->player_hp / 12.;
-        input_matrix[i * 16 + 8] = (float) card->enemy_hp / 12.;
-        input_matrix[i * 16 + 9] = (float) card->card_draw / 2.;
-        input_matrix[i * 16 + 10] = (float) has_keyword(*card, BREAKTHROUGH);
-        input_matrix[i * 16 + 11] = (float) has_keyword(*card, CHARGE);
-        input_matrix[i * 16 + 12] = (float) has_keyword(*card, DRAIN);
-        input_matrix[i * 16 + 13] = (float) has_keyword(*card, GUARD);
-        input_matrix[i * 16 + 14] = (float) has_keyword(*card, LETHAL);
-        input_matrix[i * 16 + 15] = (float) has_keyword(*card, WARD);
-    }
-
-    return input_matrix;
-}
-
 int main() {
     srandom(clock());
 
@@ -250,12 +223,11 @@ int main() {
             draft_options[3 * (draft_turn - 1) + 1] = state->player_hand[1];
             draft_options[3 * (draft_turn - 1) + 2] = state->player_hand[2];
 
-            // encode state features into a matrix
-            double input_matrix[3 * 16];
-            encode_state(state, input_matrix);
-
-            // ask the network which card to choose
-            int action = predict(input_matrix);
+            // ask the draft strategy which card to choose
+            int action = choose_card(
+                    state->player_hand[0].id,
+                    state->player_hand[1].id,
+                    state->player_hand[2].id);
 
             // store our choices
             our_choices[draft_turn - 1] = action;
