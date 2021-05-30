@@ -108,13 +108,12 @@ Node* select_with_uct(Node* node, double exploration_weight) {
     return best_child;
 }
 
-Node* select_node(Node* root, State* state) {
+Node* select_node(Node* root) {
     Node* node = root;
 
     // while is not terminal and have no unexplored children, descend
     while (node->children > 0 && node->unvisited_children == 0) {
         node = select_with_uct(node, EXPLORATION_WEIGHT);
-        act_on_state(state, node->action);
     }
 
     return node;
@@ -138,6 +137,8 @@ Node* expand(Node* node, int action) {
 
     new_leaf->rewards = 0;
     new_leaf->visits = 0;
+
+    copy_state(&node->state, &new_leaf->state);
 
     return new_leaf;
 }
@@ -225,15 +226,21 @@ int max_atk_default_policy(State* state) {
 }
 
 int simulate(State* state) {
-    while (state->winner == NONE) {
-        // use a random default policy
-        int action = max_atk_default_policy(state);
-
-        // apply the action
-        act_on_state(state, action);
+    if (state_copy == NULL) {
+        state_copy = malloc(sizeof(State));
     }
 
-    return state->winner;
+    copy_state(state, state_copy);
+
+    while (state_copy->winner == NONE) {
+        // use a random default policy
+        int action = max_atk_default_policy(state_copy);
+
+        // apply the action
+        act_on_state(state_copy, action);
+    }
+
+    return state_copy->winner;
 }
 
 void backpropagate(Node* node, int reward, int current_player) {
@@ -251,9 +258,10 @@ void backpropagate(Node* node, int reward, int current_player) {
     }
 }
 
-void do_rollout(Node* root, State* state) {
+void do_rollout(Node* root) {
     // select a leaf and forwards the state accordingly
-    Node* node = select_node(root, state);
+    Node* node = select_node(root);
+    State* state = &node->state;
     Node* leaf = NULL;
 
     // if the leaf is not terminal, expand
@@ -265,7 +273,7 @@ void do_rollout(Node* root, State* state) {
             int counter = 0;
             while (counter != node->children - node->unvisited_children) {
                 if (action >= 96) break;
-                if (node->valid_actions[++action] == TRUE)
+                if (state->valid_actions[++action] == TRUE)
                     counter++;
             }
         }
@@ -274,19 +282,18 @@ void do_rollout(Node* root, State* state) {
         leaf = expand(node, action);
 
         // apply the action
-        act_on_state(state, action);
+        act_on_state(&leaf->state, action);
 
-        int valid_actions = calculate_valid_actions(state);
+        int valid_actions = calculate_valid_actions(&leaf->state);
 
         leaf->children = valid_actions;
         leaf->unvisited_children = valid_actions;
-        memcpy(leaf->valid_actions, state->valid_actions, sizeof(Bool) * 97);
     } else {
         leaf = node;
     }
 
     // simulate the remainder of the match and get the result
-    int winner = simulate(state);
+    int winner = simulate(&leaf->state);
     int reward = winner == root->current_player? 1 : 0;
 
     // backpropagate the simulation result upwards in the tree
@@ -350,12 +357,10 @@ int* act(State* state, Card* draft_options, int* player_choices) {
     root->parent = NULL;
     root->left_child = NULL;
     root->right_sibling = NULL;
-    memcpy(root->valid_actions, state->valid_actions, sizeof(Bool) * 97);
-
-    if (state_copy == NULL)
-        state_copy = malloc(sizeof(State));
 
     int fake_instance_id = 1000;
+
+    shuffle_draft_options(draft_options, player_choices);
 
     // determinize the player's deck
     for (int j = 0; j < state->current_player->deck_size; j++) {
@@ -380,13 +385,11 @@ int* act(State* state, Card* draft_options, int* player_choices) {
         memcpy(&state->opp_hand[j], &card, sizeof(Card));
     }
 
-    shuffle_draft_options(draft_options, player_choices);
+    memcpy(&root->state, state, sizeof(State));
 
     for (int i = 1; TRUE; i++) {
-        state_copy = copy_state(state, state_copy);
-
         // perform a rollout
-        do_rollout(root, state_copy);
+        do_rollout(root);
 
         if (i % 100 == 0) {
             double time_elapsed = (double) (clock() - start_time) / CLOCKS_PER_SEC;
