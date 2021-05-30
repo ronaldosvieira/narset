@@ -7,6 +7,7 @@
 
 int LOGS_ARE_PRECOMPUTED = FALSE;
 int NODES_ARE_PREALLOCATED = FALSE;
+int STATES_ARE_PREALLOCATED = FALSE;
 State *state_copy = NULL;
 
 Card card_centroids[8] = {
@@ -61,6 +62,20 @@ Node* get_next_node() {
     }
 
     return &preallocated_nodes[next_node++];
+}
+
+State* get_next_state() {
+    if (STATES_ARE_PREALLOCATED == FALSE) {
+        preallocated_states = malloc(STATES_TO_PREALLOCATE * sizeof(State));
+        amount_of_states = STATES_TO_PREALLOCATE;
+        next_state = 0;
+        STATES_ARE_PREALLOCATED = TRUE;
+    } else if (next_state >= amount_of_states) {
+        next_state++;
+        return malloc(sizeof(State));
+    }
+
+    return &preallocated_states[next_state++];
 }
 
 double uct_score(Node* node, double exploration_weight) {
@@ -138,7 +153,9 @@ Node* expand(Node* node, int action) {
     new_leaf->rewards = 0;
     new_leaf->visits = 0;
 
-    copy_state(&node->state, &new_leaf->state);
+    new_leaf->state = get_next_state();
+
+    copy_state(node->state, new_leaf->state);
 
     return new_leaf;
 }
@@ -227,7 +244,7 @@ int max_atk_default_policy(State* state) {
 
 int simulate(State* state) {
     if (state_copy == NULL) {
-        state_copy = malloc(sizeof(State));
+        state_copy = get_next_state();
     }
 
     copy_state(state, state_copy);
@@ -261,7 +278,7 @@ void backpropagate(Node* node, int reward, int current_player) {
 void do_rollout(Node* root) {
     // select a leaf and forwards the state accordingly
     Node* node = select_node(root);
-    State* state = &node->state;
+    State* state = node->state;
     Node* leaf = NULL;
 
     // if the leaf is not terminal, expand
@@ -282,9 +299,9 @@ void do_rollout(Node* root) {
         leaf = expand(node, action);
 
         // apply the action
-        act_on_state(&leaf->state, action);
+        act_on_state(leaf->state, action);
 
-        int valid_actions = calculate_valid_actions(&leaf->state);
+        int valid_actions = calculate_valid_actions(leaf->state);
 
         leaf->children = valid_actions;
         leaf->unvisited_children = valid_actions;
@@ -293,7 +310,7 @@ void do_rollout(Node* root) {
     }
 
     // simulate the remainder of the match and get the result
-    int winner = simulate(&leaf->state);
+    int winner = simulate(leaf->state);
     int reward = winner == root->current_player? 1 : 0;
 
     // backpropagate the simulation result upwards in the tree
@@ -357,6 +374,7 @@ int* act(State* state, Card* draft_options, int* player_choices) {
     root->parent = NULL;
     root->left_child = NULL;
     root->right_sibling = NULL;
+    root->state = get_next_state();
 
     int fake_instance_id = 1000;
 
@@ -385,7 +403,7 @@ int* act(State* state, Card* draft_options, int* player_choices) {
         memcpy(&state->opp_hand[j], &card, sizeof(Card));
     }
 
-    memcpy(&root->state, state, sizeof(State));
+    copy_state(state, root->state);
 
     for (int i = 1; TRUE; i++) {
         // perform a rollout
@@ -405,7 +423,10 @@ int* act(State* state, Card* draft_options, int* player_choices) {
     int *actions = calloc(MAX_ACTIONS, sizeof(int));
 
     choose_best(root, actions);
+
+    // "free" used allocated nodes and states
     next_node = 0;
+    next_state = 0;
 
     return actions;
 }
