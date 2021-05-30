@@ -262,12 +262,10 @@ void do_rollout(Node* root, State* state) {
         int action = 0;
 
         if (node->unvisited_children-- > 1) {
-            calculate_valid_actions(state);
-
             int counter = 0;
             while (counter != node->children - node->unvisited_children) {
                 if (action >= 96) break;
-                if (state->valid_actions[++action] == TRUE)
+                if (node->valid_actions[++action] == TRUE)
                     counter++;
             }
         }
@@ -282,6 +280,7 @@ void do_rollout(Node* root, State* state) {
 
         leaf->children = valid_actions;
         leaf->unvisited_children = valid_actions;
+        memcpy(leaf->valid_actions, state->valid_actions, sizeof(Bool) * 97);
     } else {
         leaf = node;
     }
@@ -351,6 +350,7 @@ int* act(State* state, Card* draft_options, int* player_choices) {
     root->parent = NULL;
     root->left_child = NULL;
     root->right_sibling = NULL;
+    memcpy(root->valid_actions, state->valid_actions, sizeof(Bool) * 97);
 
     if (state_copy == NULL)
         state_copy = malloc(sizeof(State));

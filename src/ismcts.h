@@ -29,6 +29,8 @@ typedef struct Node {
 
     int height;
     int unvisited_children, children;
+
+    Bool valid_actions[97];
 } Node;
 
 Node* preallocated_nodes;
